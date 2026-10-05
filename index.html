@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STEMCraft - Facilitator Studio & Kit Manager</title>
+  
+ 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+ <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            canvas: '#F7F7F5',
+            brand: {
+              50: '#f2f7f4',
+              100: '#e2ede7',
+              500: '#2d6a4f',
+              600: '#1f4e3d',
+              700: '#16382c',
+              800: '#112b22',
+              900: '#0d1f19',
+            },
+            warm: {
+              50: '#fafafa',
+              100: '#f4f4f0',
+              200: '#e5e5df',
+              300: '#d4d4cb',
+              600: '#73736c',
+              800: '#262624',
+              900: '#171716',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+   
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4cb; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #73736c; }
+    
+    body {
+      background-color: #F7F7F5;
+      color: #171716;
+    }
+    
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+    }
+    
+    .badge-offline {
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+    }
+    
+    .badge-online {
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+
+    .card-style {
+      background-color: #FFFFFF;
+      border: 1px solid #E5E5DF;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+ <header class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      
+      <!-- Brand / Logo Section -->
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm">
+          S
+        </div>
+        <div>
+          <span class="font-bold text-slate-900 text-base tracking-tight">STEMCraft</span>
+          <span class="hidden sm:inline-block text-[11px] text-slate-500 font-mono ml-2"></span>
+        </div>
+      </div>
+
+      <!-- Center:  Network Status -->
+      <div class="flex items-center space-x-4">
+        <button id="toggle-network-btn" class="flex items-center space-x-2 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition-colors">
+          <span id="network-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span id="network-text">Online</span>
+        </button>
+
+       
+        <div id="sync-status" class="hidden sm:flex items-center space-x-1.5 text-xs text-slate-500">
+          <i class="w-3.5 h-3.5 text-slate-400"></i>
+          <span id="sync-count"></span>
+          <button id="manual-sync-btn" onclick="syncQueue()" class="text-emerald-700 hover:underline font-medium ml-1">Sync</button>
+        </div>
+      </div>
+
+      <!-- Right: Role Switcher Tabs -->
+      <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+        <button id="role-facilitator" onclick="switchRole('facilitator')" class="px-3 py-1 text-xs font-medium rounded-md bg-white text-slate-900 shadow-sm transition-all">Facilitator</button>
+        <button id="role-custodian" onclick="switchRole('custodian')" class="px-3 py-1 text-xs font-medium rounded-md text-slate-600 hover:text-slate-900 transition-all">Custodian</button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+
+ 
+  
+<!-- Sub-Bar Navigation (Vertical Sidebar Layout) -->
+<nav class="w-64 bg-slate-50 border-r border-slate-200 py-4 px-4 flex-shrink-0">
+  <div class="flex flex-col space-y-3 text-xs font-medium text-slate-600">
+    <button id="tab-catalog" onclick="switchTab('catalog')" class="text-left text-emerald-700 font-semibold border-l-2 border-emerald-600 pl-2 tab-btn">Activity Catalog</button>
+    <button id="tab-saved" onclick="switchTab('saved')" class="text-left hover:text-slate-900 transition-colors pl-2 tab-btn">Saved Offline <span class="ml-1 text-xs px-1.5 py-0.5 rounded-full bg-slate-100">0</span></button>
+    <button id="tab-builder" onclick="switchTab('builder')" class="text-left hover:text-slate-900 transition-colors pl-2 tab-btn">Session Planner</button>
+    <button id="tab-custodian" onclick="switchTab('custodian')" class="text-left hover:text-slate-900 transition-colors pl-2 tab-btn">Equipment Custody</button>
+  </div>
+</nav>
+
+  <!-- Main Container -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- Auto-save notification banner (FR6) -->
+    <div id="autosave-toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-slate-900 text-white text-xs font-mono px-4 py-3 rounded-lg shadow-2xl flex items-center space-x-3 border border-slate-700">
+      <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+      <span id="autosave-message">Draft restored automatically</span>
+    </div>
+
+    <!-- VIEW 1: CATALOG / BROWSE (FR1) -->
+    <section id="view-catalog" class="space-y-6">
+
+      <!-- catalog header container -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 ">
+  <div>
+    <h1 class="text-xl font-bold text-warm-900 tracking-tight">STEM Activity Catalog</h1>
+    <p class="text-xs text-warm-600 mt-1">Explore ctivities aligned with you curriculum with step-by-step facilitation guidance.</p>
+  </div>
+  <div class="relative min-w-[280px]">
+    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-warm-600"></i>
+    <input type="text" id="search-input" oninput="applyFilters()" placeholder="Search topics, keywords, materials..." class="w-full pl-10 pr-4 py-2 text-sm bg-warm-100/60 border border-warm-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+  </div>
+</div>
+
+<!-- Filter Bar container -->
+<div class="bg-white p-5 rounded-2xl border border-warm-200 shadow-sm space-y-4">
+  <div class="flex items-center justify-between border-b border-warm-200 pb-3">
+    <div class="flex items-center space-x-2">
+      <i data-lucide="sliders" class="w-4 h-4 text-brand-600"></i>
+      <span class="text-xs font-bold uppercase tracking-wider text-warm-800">Filter Activities</span>
+    </div>
+    <button onclick="resetFilters()" class="text-xs text-brand-600 hover:text-brand-700 font-semibold transition-colors">Reset All</button>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Level -->
+    <div>
+      <label class="block text-xs font-semibold text-warm-800 mb-1.5">Target Level</label>
+      <select id="filter-level" onchange="applyFilters()" class="w-full text-xs bg-warm-100/60 border border-warm-200 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-500 outline-none">
+        <option value="">All Levels</option>
+        <option value="Primary">Primary (K-5)</option>
+        <option value="Middle School">Middle School (6-8)</option>
+        <option value="High School">High School (9-12)</option>
+      </select>
+    </div>
+
+    <!-- Topic -->
+    <div>
+      <label class="block text-xs font-semibold text-warm-800 mb-1.5">STEM Topic</label>
+      <select id="filter-topic" onchange="applyFilters()" class="w-full text-xs bg-warm-100/60 border border-warm-200 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-500 outline-none">
+        <option value="">All Topics</option>
+        <option value="Physics">Physics & Mechanics</option>
+        <option value="Robotics">Robotics & Code</option>
+        <option value="Environmental">Environmental Science</option>
+        <option value="Chemistry">Chemistry & Materials</option>
+      </select>
+    </div>
+
+    <!-- Duration -->
+    <div>
+      <label class="block text-xs font-semibold text-warm-800 mb-1.5">Max Duration</label>
+      <select id="filter-duration" onchange="applyFilters()" class="w-full text-xs bg-warm-100/60 border border-warm-200 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-500 outline-none">
+        <option value="">Any Duration</option>
+        <option value="30">Under 30 mins</option>
+        <option value="45">Under 45 mins</option>
+        <option value="60">Under 60 mins</option>
+      </select>
+    </div>
+
+    <!-- Required Materials -->
+    <div>
+      <label class="block text-xs font-semibold text-warm-800 mb-1.5">Key Materials</label>
+      <select id="filter-materials" onchange="applyFilters()" class="w-full text-xs bg-warm-100/60 border border-warm-200 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-500 outline-none">
+        <option value="">Any Materials</option>
+        <option value="Cardboard">Cardboard / Recyclables</option>
+        <option value="Microcontrollers">Sensors / Microcontrollers</option>
+        <option value="Water">Water / Liquids</option>
+        <option value="Basic Electronics">Basic Electronics</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+      <!-- Activity Cards Grid (FR1) -->
+      <div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- VIEW 2: SAVED OFFLINE ACTIVITIES (FR2) -->
+    <section id="view-saved" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm flex items-center justify-between">
+  <div>
+    <h1 class="text-xl font-bold text-warm-900 tracking-tight">Offline Activity Vault</h1>
+    <p class="text-xs text-warm-600 mt-1">Activities stored locally on this device for offline field facilitation without connection.</p>
+  </div>
+  <div class="flex items-center space-x-2 text-xs font-mono bg-emerald-50 text-emerald-800 px-3 py-1.5 rounded-lg border border-emerald-200">
+    <i data-lucide="check-circle" class="w-4 h-4"></i>
+    <span>Offline Storage Ready</span>
+  </div>
+</div>
+
+      <div id="saved-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- VIEW 3: SESSION PLAN BUILDER (FR3, FR4, FR6, FR8) -->
+    <section id="view-builder" class="hidden space-y-6">
+      
+      <!-- Builder Top Header -->
+<div class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <div>
+    <div class="flex items-center space-x-2">
+      <h1 class="text-xl font-bold text-warm-900 tracking-tight">Session Plan Studio</h1>
+      <span id="autosave-status-badge" class="text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 bg-warm-100 text-warm-800 rounded">Saved</span>
+    </div>
+    <p class="text-xs text-warm-600 mt-1">Design structured facilitation plans including timings, safety notes, and inclusion strategies.</p>
+  </div>
+
+  <div class="flex items-center space-x-2">
+    <button onclick="duplicateCurrentPlan()" class="px-3.5 py-2 text-xs font-semibold text-warm-800 bg-warm-100 hover:bg-warm-200 rounded-xl transition-all flex items-center space-x-1.5">
+      <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+      <span>Duplicate Draft (FR8)</span>
+    </button>
+    
+    <button onclick="saveSessionPlan()" class="px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-all shadow-sm flex items-center space-x-1.5">
+      <i data-lucide="save" class="w-3.5 h-3.5"></i>
+      <span>Save & Finalize Plan</span>
+    </button>
+  </div>
+</div>
+
+<!-- Form Container Card -->
+<div class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm space-y-5">
+  <input type="hidden" id="plan-id" value="">
+
+  <div>
+    <label class="block text-xs font-bold text-warm-800 uppercase tracking-wider mb-1">Session Plan Title</label>
+    <input type="text" id="plan-title" oninput="triggerAutoSave()" placeholder="e.g. Hands-on Wind Turbine Physics - Group B" class="w-full text-sm font-semibold bg-warm-100/60 border border-warm-200 rounded-xl px-4 py-2.5 focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none">
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-xs font-bold text-warm-800 uppercase tracking-wider mb-1">Associated Activity</label>
+      <select id="plan-activity-select" onchange="onActivitySelect(this.value); triggerAutoSave()" class="w-full text-xs bg-warm-100/60 border border-warm-200 rounded-xl p-2.5 focus:ring-2 focus:ring-brand-500 outline-none">
+        <option value="">-- Select base activity --</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-warm-800 uppercase tracking-wider mb-1">Target Group / Class</label>
+      <input type="text" id="plan-target" oninput="triggerAutoSave()" placeholder="e.g. Grade 7 - Science Club" class="w-full text-xs bg-warm-100/60 border border-warm-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-brand-500">
+    </div>
+  </div>
+
+  <!-- Steps & Timings Label -->
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <label class="block text-xs font-bold text-warm-800 uppercase tracking-wider">Activity Steps & Timing Breakdown</label>
+      <button type="button" onclick="addStepRow()" class="text-xs text-brand-600 font-semibold hover:underline flex items-center space-x-1">
+        <i data-lucide="plus" class="w-3 h-3"></i><span>Add Step</span>
+      </button>
+    </div>
+    <div id="steps-container" class="space-y-3">
+      <!-- Populated via JS -->
+    </div>
+  </div>
+
+  <!-- Materials Checklist -->
+  <div>
+    <label class="block text-xs font-bold text-warm-800 uppercase tracking-wider mb-1">Required Materials & Kits</label>
+    <textarea id="plan-materials" oninput="triggerAutoSave()" rows="3" placeholder="List required quantities, consumables, and toolkits..." class="w-full text-xs bg-warm-100/60 border border-warm-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+  </div>
+</div>
+
+            <!-- Safety Notes (FR4) -->
+            <div>
+              <label class="block text-xs font-bold text-red-600 uppercase tracking-wider mb-1 flex items-center space-x-1">
+                <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+                <span>Safety Notes & Risk Controls</span>
+              </label>
+              <textarea id="plan-safety" oninput="triggerAutoSave()" rows="3" placeholder="Eye protection requirements, hot glue handling, sharp edge advisories..." class="w-full text-xs bg-red-50/50 border border-red-200 rounded-xl p-3 text-red-950 outline-none focus:ring-2 focus:ring-red-400"></textarea>
+            </div>
+
+            <!-- Inclusion Prompts (FR4) -->
+            <div>
+              <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1 flex items-center space-x-1">
+                <i data-lucide="heart-handshake" class="w-3.5 h-3.5"></i>
+                <span>Inclusion & Universal Design Prompts</span>
+              </label>
+              <textarea id="plan-inclusion" oninput="triggerAutoSave()" rows="3" placeholder="Differentiated tasks, tactile options for visual learners, language scaffolds..." class="w-full text-xs bg-indigo-50/50 border border-indigo-200 rounded-xl p-3 text-indigo-950 outline-none focus:ring-2 focus:ring-indigo-400"></textarea>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right Col: Saved Session Plans List & Quick Loading -->
+        <div class="space-y-6">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
+              <span>Saved Session Plans</span>
+              <span id="saved-plans-count" class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono">0</span>
+            </h2>
+            <div id="plans-list" class="space-y-3 max-h-[600px] overflow-y-auto pr-1">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 4: EQUIPMENT CUSTODIAN (FR7) -->
+    <section id="view-custodian" class="hidden space-y-6">
+      
+      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-xl font-bold text-slate-900 tracking-tight">Equipment Kit Custody</h1>
+          <p class="text-xs text-slate-500 mt-1">Track intended checkout dates, responsible facilitators, and kit return status[cite: 1].</p>
+        </div>
+        <button onclick="openKitModal()" class="px-4 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all shadow-sm flex items-center space-x-1.5 self-start sm:self-auto">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>Log Kit Checkout</span>
+        </button>
+      </div>
+
+      <!-- Kit Inventory & Checkout Table (FR7) -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <th class="py-3.5 px-4">Kit Name / ID</th>
+                <th class="py-3.5 px-4">Responsible Facilitator</th>
+                <th class="py-3.5 px-4">Intended Date</th>
+                <th class="py-3.5 px-4">Return Status</th>
+                <th class="py-3.5 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="kits-table-body" class="divide-y divide-slate-100 text-xs">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: LOG / EDIT KIT CHECKOUT (FR7) -->
+  <div id="kit-modal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="font-bold text-sm tracking-tight" id="modal-kit-title">Log Kit Checkout Record</h3>
+        <button onclick="closeKitModal()" class="text-slate-400 hover:text-white transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <form id="kit-form" onsubmit="handleKitFormSubmit(event)" class="p-6 space-y-4">
+        <input type="hidden" id="kit-id" value="">
+        
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Kit Name / Identifier</label>
+          <input type="text" id="kit-name" required placeholder="e.g. Arduino Sensor Array Kit #04" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Responsible Person / Facilitator</label>
+          <input type="text" id="kit-person" required placeholder="e.g. Sarah Jenkins" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Intended Usage Date</label>
+          <input type="date" id="kit-date" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Return Status</label>
+          <select id="kit-status" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-brand-500">
+            <option value="Checked Out">Checked Out</option>
+            <option value="Returned">Returned</option>
+            <option value="Overdue">Overdue</option>
+          </select>
+        </div>
+
+        <div class="pt-4 flex justify-end space-x-2 border-t border-slate-100">
+          <button type="button" onclick="closeKitModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-all shadow-sm">Save Kit Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic Application -->
+  <script>
+    // --- MOCK DATABASE ACTIVITIES ---
+    const ACTIVITIES_DATA = [
+      {
+        id: "act-101",
+        title: "Mini Wind Turbine Generator",
+        level: "Middle School",
+        topic: "Physics",
+        duration: 45,
+        materials: ["Cardboard", "Basic Electronics", "DC Motors"],
+        description: "Students assemble micro wind turbines using recycled cardboard blades and small DC motors to convert wind kinetic energy into electrical current.",
+        steps: [
+          { name: "Setup & Intro", time: "10 min", desc: "Discuss aerodynamics and clean power generation." },
+          { name: "Blade Construction", time: "20 min", desc: "Cut and test cardboard pitch angles." },
+          { name: "Testing & Output Measurement", time: "15 min", desc: "Measure voltage output using multimeter." }
+        ],
+        safety: "Caution when using craft knives for cutting cardboard. Eye protection required during fan testing.",
+        inclusion: "Provide pre-cut blade templates for students requiring motor skill support."
+      },
+      {
+        id: "act-102",
+        title: "Soil Micro-Ecosystem Analysis",
+        level: "High School",
+        topic: "Environmental",
+        duration: 60,
+        materials: ["Water", "Soil Samples", "pH Kits"],
+        description: "Analyze local soil health through moisture retention, pH indicator reactions, and organism counting under magnification.",
+        steps: [
+          { name: "Field Sample Prep", time: "15 min", desc: "Mix soil samples with distilled water." },
+          { name: "pH Indicator Test", time: "25 min", desc: "Observe color changes against control charts." },
+          { name: "Data Logging", time: "20 min", desc: "Record findings and discuss soil quality impacts." }
+        ],
+        safety: "Wear nitrile gloves. Wash hands thoroughly post-activity.",
+        inclusion: "Provide colorimeter digital readings or high-contrast reference cards for colorblind participants."
+      },
+      {
+        id: "act-103",
+        title: "Autonomous Obstacle Avoidance Bot",
+        level: "High School",
+        topic: "Robotics",
+        duration: 60,
+        materials: ["Microcontrollers", "Basic Electronics"],
+        description: "Program an ultrasonic sensor-driven robot rover to detect obstacles and navigate a maze autonomously.",
+        steps: [
+          { name: "Sensor Wiring", time: "15 min", desc: "Connect HC-SR04 ultrasonic sensors to microcontroller." },
+          { name: "Code Logic Upload", time: "25 min", desc: "Flash conditional logic for obstacle avoidance." },
+          { name: "Maze Run", time: "20 min", desc: "Benchmark speed and obstacle detection range." }
+        ],
+        safety: "Ensure low battery voltages (<9V). Avoid exposed lead wires.",
+        inclusion: "Pair programming strategy to support varied coding confidence levels."
+      },
+      {
+        id: "act-104",
+        title: "Hydraulic Bridge Lift",
+        level: "Primary",
+        topic: "Physics",
+        duration: 30,
+        materials: ["Cardboard", "Water", "Syringes"],
+        description: "Demonstrate Pascal's principle by creating dual-syringe hydraulic lifts to move a cardboard bridge span.",
+        steps: [
+          { name: "Hydraulic Tubing Setup", time: "10 min", desc: "Fill syringes with water avoiding air bubbles." },
+          { name: "Bridge Hinge Assembly", time: "10 min", desc: "Attach syringe pistons to hinged bridge deck." },
+          { name: "Weight Test", time: "10 min", desc: "Test maximum payload lifted before seal failure." }
+        ],
+        safety: "Wipe up water spills immediately to prevent slip hazards.",
+        inclusion: "Use oversized syringe handles for easier gripping."
+      }
+    ];
+
+    // --- INITIAL STATE MANAGEMENT ---
+    let state = {
+      isOnline: true,
+      role: 'facilitator',
+      savedActivityIds: JSON.parse(localStorage.getItem('stem_saved_activities') || '[]'),
+      sessionPlans: JSON.parse(localStorage.getItem('stem_session_plans') || '[]'),
+      syncQueue: JSON.parse(localStorage.getItem('stem_sync_queue') || '[]'),
+      kits: JSON.parse(localStorage.getItem('stem_kits') || JSON.stringify([
+        { id: 'kit-1', name: 'Arduino Robotics Kit #02', person: 'Maria Garcia', date: '2026-10-12', status: 'Checked Out' },
+        { id: 'kit-2', name: 'Water Quality Analysis Set', person: 'David Chen', date: '2026-10-05', status: 'Returned' }
+      ]))
+    };
+
+    let autoSaveTimer = null;
+
+    // --- INIT APP ---
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      populateActivitySelect();
+      renderCatalog();
+      renderSavedActivities();
+      renderPlansList();
+      renderKitsTable();
+      setNetworkStatus(navigator.onLine);
+      loadDraftOrCreateNew();
+
+      // Online/Offline Listeners
+      window.addEventListener('online', () => setNetworkStatus(true));
+      window.addEventListener('offline', () => setNetworkStatus(false));
+      document.getElementById('toggle-network-btn').addEventListener('click', () => {
+        setNetworkStatus(!state.isOnline);
+      });
+    });
+
+    // --- NETWORK & SYNC LOGIC (FR5) ---//
+    function setNetworkStatus(Online) {
+  const btn = document.getElementById('toggle-network-btn');
+  const dot = document.getElementById('network-dot');
+  const text = document.getElementById('network-text');
+
+  if (!btn || !dot || !text) return;
+
+  if (navigator.onLine) {
+    // Online State (Subtle green dot, dark background)
+    btn.className = "flex items-center space-x-2 px-2.5 py-1 rounded-md text-xs font-medium bg-brand-800/60 border border-brand-700/50 text-brand-100 hover:bg-brand-800 transition-colors";
+    dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400";
+    text.textContent = "Online";
+  } else {
+    // Offline State (Warm amber dot & soft border)
+    btn.className = "flex items-center space-x-2 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-950/40 border border-amber-700/50 text-amber-200 hover:bg-amber-900/50 transition-colors";
+    dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400";
+    text.textContent = "Offline Mode";
+  }
+}
+    function queueForSync(actionType, payload) {
+      const item = { id: 'sync-' + Date.now(), actionType, payload, timestamp: new Date().toISOString() };
+      state.syncQueue.push(item);
+      localStorage.setItem('stem_sync_queue', JSON.stringify(state.syncQueue));
+      updateSyncUI();
+
+      if (state.isOnline) {
+        syncQueue();
+      } else {
+        showToast("Saved offline. Placed in sync queue (FR5).");
+      }
+    }
+
+    function syncQueue() {
+      if (!state.isOnline || state.syncQueue.length === 0) return;
+
+      // Process pending queue items
+      showToast(`Synchronizing ${state.syncQueue.length} offline updates...`);
+      state.syncQueue = [];
+      localStorage.setItem('stem_sync_queue', JSON.stringify(state.syncQueue));
+      updateSyncUI();
+      setTimeout(() => showToast("All offline changes synchronized!"), 600);
+    }
+
+    function updateSyncUI() {
+      const container = document.getElementById('sync-status');
+      const countEl = document.getElementById('sync-count');
+      if (state.syncQueue.length > 0) {
+        container.classList.remove('hidden');
+        countEl.textContent = `${state.syncQueue.length} pending sync${state.syncQueue.length > 1 ? 's' : ''}`;
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    // --- TAB & PERSONA NAVIGATION ---
+    function switchTab(tabKey) {
+    // 1. Reset all tab button styles
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-brand-600', 'border-emerald-600', 'text-brand-600', 'text-emerald-700', 'font-semibold', 'border-b-2');
+        btn.classList.add('border-transparent', 'text-slate-600');
+    });
+
+    // 2. Highlight active tab button
+    const activeBtn = document.getElementById(`tab-${tabKey}`);
+    if (activeBtn) {
+        activeBtn.classList.remove('border-transparent', 'text-slate-600');
+        activeBtn.classList.add('border-emerald-600', 'text-emerald-700', 'font-semibold', 'border-b-2');
+    }
+
+    
+    ['catalog', 'saved', 'builder', 'custodian'].forEach(view => {
+        const el = document.getElementById(`view-${view}`);
+        if (el) el.classList.add('hidden');
+    });
+
+    // 4. Show the selected view section safely
+    const activeView = document.getElementById(`view-${tabKey}`);
+    if (activeView) {
+        activeView.classList.remove('hidden');
+    }
+}
+
+    function switchRole(role) {
+      state.role = role;
+      const bFac = document.getElementById('role-facilitator');
+      const bCust = document.getElementById('role-custodian');
+
+      if (role === 'facilitator') {
+        bFac.className = "px-3 py-1 rounded-md bg-brand-600 text-white transition-all shadow-sm";
+        bCust.className = "px-3 py-1 rounded-md text-slate-400 hover:text-white transition-all";
+        switchTab('catalog');
+      } else {
+        bCust.className = "px-3 py-1 rounded-md bg-brand-600 text-white transition-all shadow-sm";
+        bFac.className = "px-3 py-1 rounded-md text-slate-400 hover:text-white transition-all";
+        switchTab('custodian');
+      }
+    }
+
+    // --- ACTIVITY CATALOG & FILTERING (FR1, FR2) ---
+    function renderCatalog() {
+      const grid = document.getElementById('catalog-grid');
+      const filtered = getFilteredActivities();
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm">No matching STEM activities found. Adjust your filters.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(act => renderActivityCard(act)).join('');
+      lucide.createIcons();
+    }
+
+     function renderActivityCard(act) {
+      const isSaved = state.savedActivityIds.includes(act.id);
+      return `
+        <div class="card-style rounded-2xl p-5 hover:shadow-md transition-all flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-centre justify-start gap-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-warm-100 text-warm-800">${act.level}</span>
+              <span class="text-xs font-mono text-warm-600 flex items-center">Duration: ${act.duration} mins</span>
+            </div>
+            
+            <h3 class="font-bold text-warm-900 text-base leading-snug">${act.title}</h3>
+            <p class="text-xs text-warm-600 line-clamp-2 leading-relaxed">${act.description}</p>
+            
+            <div class="flex flex-wrap gap-1.5 pt-1">
+              ${act.materials.map(m => `<span class="text-[10px] bg-brand-50 text-brand-700 border border-brand-100 px-2 py-0.5 rounded-md font-medium">${m}</span>`).join('')}
+            </div>
+          </div>
+
+          <div class="pt-4 mt-4 border-t border-warm-200 flex items-center justify-between gap-2">
+            <!-- FR2 Save Offline Button -->
+            <button onclick="toggleSaveActivity('${act.id}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1 transition-all ${isSaved ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-warm-100 text-warm-800 hover:bg-warm-200'}">
+              <i  class="w-3.5 h-3.5"></i>
+              <span>${isSaved ? 'Saved Offline' : 'Save Offline'}</span>
+            </button>
+
+            <!-- FR3 Create Plan Button -->
+            <button onclick="createPlanFromActivity('${act.id}')" class="px-3 py-1.5 bg-blue-400 text-white rounded-xl text-xs font-semibold hover:bg-brand-700 transition-all flex items-center space-x-1 shadow-sm">
+              <span>Create Plan</span>
+              <i  class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function getFilteredActivities() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const level = document.getElementById('filter-level').value;
+      const topic = document.getElementById('filter-topic').value;
+      const dur = document.getElementById('filter-duration').value;
+      const mat = document.getElementById('filter-materials').value;
+
+      return ACTIVITIES_DATA.filter(act => {
+        const matchesSearch = !q || act.title.toLowerCase().includes(q) || act.description.toLowerCase().includes(q) || act.materials.some(m => m.toLowerCase().includes(q));
+        const matchesLevel = !level || act.level === level;
+        const matchesTopic = !topic || act.topic === topic;
+        const matchesDur = !dur || act.duration <= parseInt(dur);
+        const matchesMat = !mat || act.materials.includes(mat);
+
+        return matchesSearch && matchesLevel && matchesTopic && matchesDur && matchesMat;
+      });
+    }
+
+    function applyFilters() {
+      renderCatalog();
+    }
+
+    function resetFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('filter-level').value = '';
+      document.getElementById('filter-topic').value = '';
+      document.getElementById('filter-duration').value = '';
+      document.getElementById('filter-materials').value = '';
+      renderCatalog();
+    }
+
+    // --- OFFLINE SAVING (FR2) ---
+    function toggleSaveActivity(actId) {
+      const index = state.savedActivityIds.indexOf(actId);
+      if (index > -1) {
+        state.savedActivityIds.splice(index, 1);
+        showToast("Removed from offline storage.");
+      } else {
+        state.savedActivityIds.push(actId);
+        showToast("Saved for offline use (FR2)!");
+      }
+      localStorage.setItem('stem_saved_activities', JSON.stringify(state.savedActivityIds));
+      renderCatalog();
+      renderSavedActivities();
+    }
+
+    function renderSavedActivities() {
+      const grid = document.getElementById('saved-grid');
+      const counter = document.getElementById('saved-counter');
+      counter.textContent = state.savedActivityIds.length;
+
+      const savedList = ACTIVITIES_DATA.filter(a => state.savedActivityIds.includes(a.id));
+
+      if (savedList.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-white p-12 text-center rounded-2xl border border-slate-200/80">
+            <i data-lucide="bookmark" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+            <p class="text-xs font-semibold text-slate-600">No offline activities saved yet.</p>
+            <p class="text-xs text-slate-400 mt-1">Browse the Activity Library and click "Save Offline" to make items available without internet[cite: 1].</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = savedList.map(act => renderActivityCard(act)).join('');
+      lucide.createIcons();
+    }
+
+    // --- SESSION PLAN BUILDER & AUTO-SAVE (FR3, FR4, FR6, FR8) ---
+    function populateActivitySelect() {
+      const select = document.getElementById('plan-activity-select');
+      select.innerHTML = `<option value="">-- Select base activity --</option>` + 
+        ACTIVITIES_DATA.map(a => `<option value="${a.id}">${a.title} (${a.level})</option>`).join('');
+    }
+
+ function addStepRow(name = "", time = "", desc = "") {
+      const container = document.getElementById('steps-container');
+      const rowId = 'step-' + Date.now() + Math.random().toString(36).substr(2, 4);
+      
+      const div = document.createElement('div');
+      div.className = "flex flex-col sm:flex-row gap-2 bg-warm-100/60 p-3 rounded-xl border border-warm-200 items-start";
+      div.id = rowId;
+      div.innerHTML = `
+        <input type="text" value="${name}" oninput="triggerAutoSave()" placeholder="Step Name" class="text-xs bg-white border border-warm-200 rounded-lg p-2 font-semibold w-full sm:w-1/3 outline-none focus:ring-2 focus:ring-brand-500">
+        <input type="text" value="${time}" oninput="triggerAutoSave()" placeholder="Timing (e.g. 15 min)" class="text-xs bg-white border border-warm-200 rounded-lg p-2 w-full sm:w-1/4 outline-none focus:ring-2 focus:ring-brand-500">
+        <input type="text" value="${desc}" oninput="triggerAutoSave()" placeholder="Facilitator instruction description" class="text-xs bg-white border border-warm-200 rounded-lg p-2 w-full sm:w-1/2 outline-none focus:ring-2 focus:ring-brand-500">
+        <button type="button" onclick="document.getElementById('${rowId}').remove(); triggerAutoSave();" class="text-warm-600 hover:text-red-600 p-2">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </button>
+      `;
+      container.appendChild(div);
+      lucide.createIcons();
+    }
+
+    function createPlanFromActivity(actId) {
+      const act = ACTIVITIES_DATA.find(a => a.id === actId);
+      if (!act) return;
+
+      document.getElementById('plan-id').value = 'plan-' + Date.now();
+      document.getElementById('plan-title').value = `Facilitation Plan: ${act.title}`;
+      document.getElementById('plan-activity-select').value = act.id;
+      document.getElementById('plan-target').value = act.level;
+      document.getElementById('plan-materials').value = act.materials.join(', ');
+      document.getElementById('plan-safety').value = act.safety || '';
+      document.getElementById('plan-inclusion').value = act.inclusion || '';
+
+      const stepsContainer = document.getElementById('steps-container');
+      stepsContainer.innerHTML = '';
+      if (act.steps) {
+        act.steps.forEach(s => addStepRow(s.name, s.time, s.desc));
+      }
+
+      switchTab('builder');
+      triggerAutoSave();
+    }
+
+    function onActivitySelect(actId) {
+      if (!actId) return;
+      const act = ACTIVITIES_DATA.find(a => a.id === actId);
+      if (act) {
+        if (!document.getElementById('plan-title').value) {
+          document.getElementById('plan-title').value = `Session: ${act.title}`;
+        }
+        if (!document.getElementById('plan-materials').value) {
+          document.getElementById('plan-materials').value = act.materials.join(', ');
+        }
+        if (!document.getElementById('plan-safety').value) {
+          document.getElementById('plan-safety').value = act.safety || '';
+        }
+        if (!document.getElementById('plan-inclusion').value) {
+          document.getElementById('plan-inclusion').value = act.inclusion || '';
+        }
+      }
+    }
+
+    // Real-time Auto-save Drafts (FR6)
+   function triggerAutoSave() {
+    const badge = document.getElementById('autosave-status-badge');
+    badge.textContent = "saving...";
+    badge.className = "text-xs text-slate-400 font-normal px-2 py-0.5 rounded bg-slate-100";
+
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+        saveDraftToLocalStorage();
+        badge.textContent = "Saved";
+        badge.className = "text-xs text-slate-500 font-normal px-2 py-0.5 rounded bg-slate-100";
+    }, 1000);
+}
+
+    function getPlanFormData() {
+      const steps = [];
+      document.querySelectorAll('#steps-container > div').forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        steps.push({ name: inputs[0].value, time: inputs[1].value, desc: inputs[2].value });
+      });
+
+      return {
+        id: document.getElementById('plan-id').value || ('plan-' + Date.now()),
+        title: document.getElementById('plan-title').value || 'Untitled STEM Session Plan',
+        activityId: document.getElementById('plan-activity-select').value,
+        target: document.getElementById('plan-target').value,
+        materials: document.getElementById('plan-materials').value,
+        safety: document.getElementById('plan-safety').value,
+        inclusion: document.getElementById('plan-inclusion').value,
+        steps: steps,
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function saveDraftToLocalStorage() {
+      const draft = getPlanFormData();
+      localStorage.setItem('stem_current_draft', JSON.stringify(draft));
+      document.getElementById('draft-indicator').classList.remove('hidden');
+    }
+
+    function loadDraftOrCreateNew() {
+      const savedDraft = localStorage.getItem('stem_current_draft');
+      if (savedDraft) {
+        try {
+          const draft = JSON.parse(savedDraft);
+          populatePlanForm(draft);
+          showToast("Restored active session plan draft (FR6)");
+        } catch(e) { createNewPlanForm(); }
+      } else {
+        createNewPlanForm();
+      }
+    }
+
+    function populatePlanForm(plan) {
+      document.getElementById('plan-id').value = plan.id;
+      document.getElementById('plan-title').value = plan.title || '';
+      document.getElementById('plan-activity-select').value = plan.activityId || '';
+      document.getElementById('plan-target').value = plan.target || '';
+      document.getElementById('plan-materials').value = plan.materials || '';
+      document.getElementById('plan-safety').value = plan.safety || '';
+      document.getElementById('plan-inclusion').value = plan.inclusion || '';
+
+      const stepsContainer = document.getElementById('steps-container');
+      stepsContainer.innerHTML = '';
+      if (plan.steps && plan.steps.length > 0) {
+        plan.steps.forEach(s => addStepRow(s.name, s.time, s.desc));
+      } else {
+        addStepRow("Warmup & Safety Review", "10 min", "Review equipment rules and learning objectives.");
+      }
+    }
+
+    function createNewPlanForm() {
+      document.getElementById('plan-id').value = 'plan-' + Date.now();
+      document.getElementById('plan-title').value = '';
+      document.getElementById('plan-activity-select').value = '';
+      document.getElementById('plan-target').value = '';
+      document.getElementById('plan-materials').value = '';
+      document.getElementById('plan-safety').value = '';
+      document.getElementById('plan-inclusion').value = '';
+      document.getElementById('steps-container').innerHTML = '';
+      addStepRow("Introduction & Objective", "10 min", "Set context and explain tools.");
+      triggerAutoSave();
+    }
+
+    function saveSessionPlan() {
+      const plan = getPlanFormData();
+      
+      const idx = state.sessionPlans.findIndex(p => p.id === plan.id);
+      if (idx > -1) {
+        state.sessionPlans[idx] = plan;
+      } else {
+        state.sessionPlans.unshift(plan);
+      }
+
+      localStorage.setItem('stem_session_plans', JSON.stringify(state.sessionPlans));
+      queueForSync('SAVE_PLAN', plan); // FR5
+      renderPlansList();
+      showToast("Session plan finalized and saved!");
+    }
+
+    // FR8: Duplicate Existing Session Plan
+    function duplicateCurrentPlan() {
+      const current = getPlanFormData();
+      const clone = {
+        ...current,
+        id: 'plan-' + Date.now(),
+        title: `${current.title} (Copy)`,
+        updatedAt: new Date().toISOString()
+      };
+
+      populatePlanForm(clone);
+      triggerAutoSave();
+      showToast("Duplicated plan! Modify and save as new (FR8).");
+    }
+
+    function renderPlansList() {
+      const container = document.getElementById('plans-list');
+      const counter = document.getElementById('saved-plans-count');
+      counter.textContent = state.sessionPlans.length;
+
+      if (state.sessionPlans.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No finalized session plans yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = state.sessionPlans.map(plan => `
+        <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2 hover:bg-slate-100/80 transition-all">
+          <div class="flex items-start justify-between">
+            <h4 class="text-xs font-bold text-slate-900 line-clamp-1">${plan.title}</h4>
+            <span class="text-[9px] font-mono text-slate-400">${new Date(plan.updatedAt).toLocaleDateString()}</span>
+          </div>
+          <div class="flex items-center space-x-2 text-[10px] text-slate-500">
+            <span>${plan.steps ? plan.steps.length : 0} steps</span>
+            <span>•</span>
+            <span class="truncate">${plan.target || 'General Audience'}</span>
+          </div>
+          <div class="flex items-center justify-end space-x-2 pt-1 border-t border-slate-200/50">
+            <button onclick="loadPlanIntoBuilder('${plan.id}')" class="text-xs font-semibold text-brand-600 hover:text-brand-700">Edit</button>
+            <button onclick="duplicatePlanById('${plan.id}')" class="text-xs font-semibold text-slate-600 hover:text-slate-900">Duplicate</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadPlanIntoBuilder(planId) {
+      const plan = state.sessionPlans.find(p => p.id === planId);
+      if (plan) {
+        populatePlanForm(plan);
+        switchTab('builder');
+        showToast(`Loaded "${plan.title}"`);
+      }
+    }
+
+    function duplicatePlanById(planId) {
+      const plan = state.sessionPlans.find(p => p.id === planId);
+      if (plan) {
+        populatePlanForm(plan);
+        duplicateCurrentPlan();
+        switchTab('builder');
+      }
+    }
+
+    // --- EQUIPMENT CUSTODIAN LOGIC (FR7) ---
+    function renderKitsTable() {
+      const tbody = document.getElementById('kits-table-body');
+
+      if (state.kits.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-xs">No kit checkout records logged.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = state.kits.map(k => {
+        let statusBadge = "bg-slate-100 text-slate-700";
+        if (k.status === 'Checked Out') statusBadge = "bg-amber-50 text-amber-700 border border-amber-200";
+        if (k.status === 'Returned') statusBadge = "bg-emerald-50 text-emerald-700 border border-emerald-200";
+        if (k.status === 'Overdue') statusBadge = "bg-red-50 text-red-700 border border-red-200";
+
+        return `
+          <tr class="hover:bg-slate-50/50 transition-colors">
+            <td class="py-3 px-4 font-bold text-slate-900">${k.name}</td>
+            <td class="py-3 px-4 text-slate-600">${k.person}</td>
+            <td class="py-3 px-4 font-mono text-slate-500 text-[11px]">${k.date}</td>
+            <td class="py-3 px-4">
+              <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${statusBadge}">${k.status}</span>
+            </td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="editKit('${k.id}')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 mr-2">Edit</button>
+              <button onclick="deleteKit('${k.id}')" class="text-xs font-semibold text-red-500 hover:text-red-700">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openKitModal(kit = null) {
+      if (kit) {
+        document.getElementById('modal-kit-title').textContent = "Edit Kit Custody Record";
+        document.getElementById('kit-id').value = kit.id;
+        document.getElementById('kit-name').value = kit.name;
+        document.getElementById('kit-person').value = kit.person;
+        document.getElementById('kit-date').value = kit.date;
+        document.getElementById('kit-status').value = kit.status;
+      } else {
+        document.getElementById('modal-kit-title').textContent = "Log Kit Checkout Record";
+        document.getElementById('kit-id').value = '';
+        document.getElementById('kit-form').reset();
+        document.getElementById('kit-date').value = new Date().toISOString().split('T')[0];
+      }
+      document.getElementById('kit-modal').classList.remove('hidden');
+    }
+
+    function closeKitModal() {
+      document.getElementById('kit-modal').classList.add('hidden');
+    }
+
+    function handleKitFormSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('kit-id').value || ('kit-' + Date.now());
+      const record = {
+        id,
+        name: document.getElementById('kit-name').value,
+        person: document.getElementById('kit-person').value,
+        date: document.getElementById('kit-date').value,
+        status: document.getElementById('kit-status').value
+      };
+
+      const idx = state.kits.findIndex(k => k.id === id);
+      if (idx > -1) {
+        state.kits[idx] = record;
+      } else {
+        state.kits.unshift(record);
+      }
+
+      localStorage.setItem('stem_kits', JSON.stringify(state.kits));
+      queueForSync('UPDATE_KIT', record);
+      renderKitsTable();
+      closeKitModal();
+      showToast("Equipment custody record saved (FR7).");
+    }
+
+    function editKit(id) {
+      const kit = state.kits.find(k => k.id === id);
+      if (kit) openKitModal(kit);
+    }
+
+    function deleteKit(id) {
+      state.kits = state.kits.filter(k => k.id !== id);
+      localStorage.setItem('stem_kits', JSON.stringify(state.kits));
+      queueForSync('DELETE_KIT', { id });
+      renderKitsTable();
+      showToast("Kit record removed.");
+    }
+
+    // --- UI HELPERS ---
+    function showToast(msg) {
+      const toast = document.getElementById('autosave-toast');
+      document.getElementById('autosave-message').textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+client/target/
+client/dist/
+client/dist-input/
+client/dist-input.zip
+client/dependency-reduced-pom.xml
+.venv/
+
+.idea/
+.vscode/

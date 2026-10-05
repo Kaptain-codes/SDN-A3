@@ -1,0 +1,10 @@
+| Req. ID | Requirement | Priority | Evidence/assumption | Stakeholder | Acceptance indicator |
+| --- | --- | --- | --- | --- | --- |
+| FR1 | Functional | Must | Browse and filter activities by level, topic, duration and materials | STEM Facilitators/teachers | Filters can be applied and produce relevant activities |
+| FR2 | Functional | Must | Save suitable activities selected for offline use | STEM Facilitators/teachers | A saved activity open without internet connection |
+| FR3 | Functional | Must | The facilitator should be able to create and save a session plan using a selected activity | STEM Facilitators/teachers | Be able to create and save a session for a chosen activity |
+| FR4 | Functional | Must | A session plan should contain the activity steps, timing, materials, safety notes and inclusion prompts | STEM Facilitators/teachers | Session plans should be informative with what steps, timing, materials and |
+| FR5 | Functional | Must | Completed plans created offline should be placed in a queue and synchronised when the connection returns | STEM Facilitators/teachers | If there is no internet connection plans can be synchronised when connection is reestablished |
+| FR6 | Functional | Must | A session plan in progress should be saved automatically so no work is lost when the app closes, the device restarts or the connection drops | STEM Facilitators/teachers | A draft plan is restored with all fields after closing the app or losing connection |
+| FR7 | Functional | Should | The equipment custodian should be able to record the intended date, responsible person and return status of a kit | Equipment custodian | A kit record shows the date, responsible person and return status |
+| FR8 | Functional | Could | A facilitator should be able to duplicate a previous session plan and use it as a starting point | STEM facilitators/teachers | A new plan can be created from a existing plan |
