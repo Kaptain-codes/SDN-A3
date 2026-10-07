@@ -1,0 +1,15 @@
+version: 1
+document: plan-to-tasks
+plan_items:
+  - id: P1.1
+    tasks: [T001, T002]
+  - id: P2.1
+    tasks: [T003, T004, T005, T006, T010]
+  - id: P3.1
+    tasks: [T007, T009]
+  - id: P4.1
+    tasks: [T008, T011, T014]
+  - id: P5.1
+    tasks: [T011, T012, T013, T014]
+  - id: P6.1
+    tasks: [T015]

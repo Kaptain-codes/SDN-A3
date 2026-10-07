@@ -1,0 +1,6 @@
+dbHost = "localhost"
+dbPort = 5432
+dbName = "stemmate"
+dbUser = "stemmate"
+dbPassword = "replace-locally"
+httpPort = 9090

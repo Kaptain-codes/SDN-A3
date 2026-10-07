@@ -24,8 +24,19 @@ public final class SyncStatusBar extends JPanel {
     }
 
     public void showStatus(SyncStatus status) {
+        showStatus(status, true, 0);
+    }
+
+    public void showStatus(SyncStatus status, boolean online, int pendingCount) {
         if (status == null) {
             message.setText("Synchronization status is unavailable.");
+            setBackground(AppTheme.WARM_100);
+            setBorder(new RoundedBorder(AppTheme.BORDER, 12, 1));
+            message.setForeground(AppTheme.TEXT_SECONDARY);
+            return;
+        }
+        if (!online && pendingCount == 0) {
+            message.setText("Offline. No pending changes.");
             setBackground(AppTheme.WARM_100);
             setBorder(new RoundedBorder(AppTheme.BORDER, 12, 1));
             message.setForeground(AppTheme.TEXT_SECONDARY);
@@ -54,10 +65,12 @@ public final class SyncStatusBar extends JPanel {
             }
         }
         message.setText(switch (status) {
-            case WAITING_TO_SYNC -> "Saved on this device. It will upload when you're back online.";
+            case WAITING_TO_SYNC -> pendingCount == 1
+                    ? "1 change saved on this device. It will upload when you're back online."
+                    : pendingCount + " changes saved on this device. They will upload when you're back online.";
             case SYNCING -> "Syncing...";
             case SYNCED -> "All changes synced.";
-            case FAILED_RETRY -> "Sync failed. Retry when online.";
+            case FAILED_RETRY -> "Sync failed. Your work is safe. Retry when online.";
         });
     }
 }

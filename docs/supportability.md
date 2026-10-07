@@ -23,3 +23,22 @@ failure; no pupil-identifying data is recorded.
 2. Leave the application open while a retry runs.
 3. Confirm that the status changes to **All changes synced**.
 4. If it remains failed, retain the plan ID and message for support.
+# Remote sync service
+
+The desktop client writes plans and outbox state locally before it calls the
+remote service. Configure the service URL with `STEMMATE_REMOTE_BASE_URL` or
+`-Dstemmate.remote.baseUrl`; the default is `http://localhost:9090`.
+
+Start the Ballerina service from `server/` with a local `Config.toml` copied
+from `Config.toml.example`. Apply `db/postgres/schema.sql` to the configured
+database before starting it. Do not commit `Config.toml` or database
+credentials.
+
+`POST /plans` accepts at most 20 plans. A `503` response leaves the plan in
+`FAILED_RETRY`; retrying the same `planId` is safe because PostgreSQL
+upserts by `plan_id`. `GET /sync/health` verifies that the service can reach
+PostgreSQL.
+
+If the service is unavailable, the desktop application still starts and local
+plans remain available. The Sync status bar and local sync log are the source
+of truth for whether a plan is waiting, syncing, synced, or retryable.

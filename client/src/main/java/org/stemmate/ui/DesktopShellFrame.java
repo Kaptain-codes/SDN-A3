@@ -51,11 +51,13 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -85,6 +87,7 @@ public final class DesktopShellFrame extends JFrame {
     private final JToggleButton facilitatorToggle = new JToggleButton("Facilitator");
     private final JToggleButton custodianToggle = new JToggleButton("Custodian");
     private final SyncStatusBar syncStatusBar = new SyncStatusBar();
+    private final JButton syncButton = new JButton("Sync");
     private final CatalogPanel catalogPanel;
     private final CatalogPanel savedPanel;
     private final PlannerPanel plannerPanel;
@@ -100,9 +103,12 @@ public final class DesktopShellFrame extends JFrame {
         this.custodyPanel = new CustodyPanel();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(1200, 780));
-        setSize(1360, 880);
-        setLocationByPlatform(true);
+        setMinimumSize(new Dimension(1000, 640));
+        Rectangle usableBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        int windowWidth = Math.min(1360, (int) Math.round(usableBounds.width * 0.9));
+        int windowHeight = Math.min(880, (int) Math.round(usableBounds.height * 0.9));
+        setSize(windowWidth, windowHeight);
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         add(buildHeader(), BorderLayout.NORTH);
         add(buildSidebar(), BorderLayout.WEST);
@@ -141,7 +147,9 @@ public final class DesktopShellFrame extends JFrame {
         onlineToggle.setSelected(controller.isOnline());
         onlineToggle.setText(controller.isOnline() ? "● Online" : "● Offline");
         onlineToggle.setForeground(controller.isOnline() ? AppTheme.EMERALD_700 : AppTheme.AMBER_700);
-        syncStatusBar.showStatus(controller.getLastSyncStatus());
+        syncStatusBar.showStatus(controller.getLastSyncStatus(), controller.isOnline(), controller.pendingCount());
+        syncButton.setEnabled(controller.isOnline() && controller.pendingCount() > 0);
+        syncButton.setText(controller.getLastSyncStatus() == SyncStatus.FAILED_RETRY ? "Retry sync" : "Sync");
         facilitatorToggle.setSelected(controller.getRole() == DesktopController.Role.FACILITATOR);
         custodianToggle.setSelected(controller.getRole() == DesktopController.Role.CUSTODIAN);
         roleStatus.setText(controller.getRole() == DesktopController.Role.FACILITATOR ? "Facilitator" : "Custodian");
@@ -182,8 +190,11 @@ public final class DesktopShellFrame extends JFrame {
         topRow.add(onlineToggle);
         pendingPanel.setOpaque(false);
         pendingPanel.add(pendingBadge);
-        JButton syncButton = new JButton("Sync");
         AppTheme.stylePrimaryButton(syncButton);
+        syncButton.setToolTipText("Upload saved plans to the remote service");
+        syncButton.getAccessibleContext().setAccessibleName("Synchronize saved plans");
+        syncButton.getAccessibleContext().setAccessibleDescription(
+                "Uploads waiting or failed plans when the application is online.");
         syncButton.addActionListener(e -> controller.syncNow());
         pendingPanel.add(syncButton);
         topRow.add(pendingPanel);
@@ -593,7 +604,14 @@ public final class DesktopShellFrame extends JFrame {
 
             JPanel form = cardPanel();
             form.setLayout(new BorderLayout(0, 16));
-            form.add(buildMainForm(), BorderLayout.CENTER);
+            JScrollPane formScrollPane = new JScrollPane(buildMainForm());
+            formScrollPane.setBorder(BorderFactory.createEmptyBorder());
+            formScrollPane.setOpaque(false);
+            formScrollPane.getViewport().setOpaque(false);
+            formScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            formScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            formScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+            form.add(formScrollPane, BorderLayout.CENTER);
             errorLabel.setForeground(AppTheme.RED_700);
             errorLabel.setFont(AppTheme.UI_SMALL);
             form.add(errorLabel, BorderLayout.SOUTH);
@@ -610,6 +628,9 @@ public final class DesktopShellFrame extends JFrame {
             savedHeader.add(savedPlansCount, BorderLayout.EAST);
             savedList.add(savedHeader, BorderLayout.NORTH);
             savedPlansList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            savedPlansList.getAccessibleContext().setAccessibleName("Saved session plans");
+            savedPlansList.getAccessibleContext().setAccessibleDescription(
+                    "Select a plan and double-click to reopen it in the plan editor.");
             savedPlansList.setCellRenderer(new SavedPlanRenderer());
             savedPlansList.setVisibleRowCount(10);
             savedPlansList.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -696,6 +717,9 @@ public final class DesktopShellFrame extends JFrame {
             title.setForeground(AppTheme.TEXT_PRIMARY);
             wrapper.add(title);
             field.setFont(AppTheme.UI_SMALL);
+            Dimension fieldSize = field.getPreferredSize();
+            field.setMinimumSize(new Dimension(fieldSize.width, 32));
+            field.setPreferredSize(new Dimension(fieldSize.width, Math.max(32, fieldSize.height)));
             wrapper.add(field);
             return wrapper;
         }
@@ -902,10 +926,19 @@ public final class DesktopShellFrame extends JFrame {
                 title.setText(value.title());
                 title.setFont(AppTheme.UI_BOLD);
                 title.setForeground(AppTheme.TEXT_PRIMARY);
-                meta.setText(value.targetGroup() + " • " + value.syncStatus());
+                meta.setText(value.targetGroup() + " | " + syncStatusText(value.syncStatus()));
                 meta.setFont(AppTheme.META);
                 meta.setForeground(AppTheme.TEXT_SECONDARY);
                 return this;
+            }
+
+            private String syncStatusText(SyncStatus status) {
+                return switch (status) {
+                    case WAITING_TO_SYNC -> "Waiting to sync";
+                    case SYNCING -> "Syncing";
+                    case SYNCED -> "Synced";
+                    case FAILED_RETRY -> "Failed - retry";
+                };
             }
         }
     }
@@ -962,6 +995,9 @@ public final class DesktopShellFrame extends JFrame {
             fieldLabel.setFont(AppTheme.UI_SMALL);
             fieldLabel.setForeground(AppTheme.TEXT_PRIMARY);
             panel.add(fieldLabel);
+            Dimension fieldSize = component.getPreferredSize();
+            component.setMinimumSize(new Dimension(fieldSize.width, 32));
+            component.setPreferredSize(new Dimension(fieldSize.width, Math.max(32, fieldSize.height)));
             panel.add(component);
             return panel;
         }

@@ -8,6 +8,9 @@ CREATE TABLE IF NOT EXISTS activities (
 CREATE TABLE IF NOT EXISTS session_plans (
     plan_id UUID PRIMARY KEY,
     activity_id UUID NOT NULL REFERENCES activities(activity_id),
+    title TEXT NOT NULL DEFAULT '',
+    target_group TEXT NOT NULL DEFAULT '',
+    payload_json JSONB NOT NULL DEFAULT '{}'::jsonb,
     received_at TIMESTAMPTZ NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL
 );
@@ -19,3 +22,8 @@ CREATE TABLE IF NOT EXISTS plan_steps (
     timing_minutes INTEGER NOT NULL CHECK (timing_minutes >= 0),
     PRIMARY KEY (plan_id, step_number)
 );
+
+ALTER TABLE session_plans
+    ADD COLUMN IF NOT EXISTS title TEXT NOT NULL DEFAULT '',
+    ADD COLUMN IF NOT EXISTS target_group TEXT NOT NULL DEFAULT '',
+    ADD COLUMN IF NOT EXISTS payload_json JSONB NOT NULL DEFAULT '{}'::jsonb;

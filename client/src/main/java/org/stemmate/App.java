@@ -7,7 +7,7 @@ import org.stemmate.model.InclusionPrompt;
 import org.stemmate.model.Material;
 import org.stemmate.model.PlanStep;
 import org.stemmate.model.SafetyNote;
-import org.stemmate.repository.LocalRemoteSessionPlanStore;
+import org.stemmate.repository.HttpRemoteSessionPlanStore;
 import org.stemmate.service.ActivityCatalogueService;
 import org.stemmate.service.EquipmentKitService;
 import org.stemmate.service.SessionPlanService;
@@ -42,7 +42,7 @@ public final class App {
             SyncManager syncManager = new SyncManager(
                     sessionPlanStore,
                     outboxRepository,
-                    new LocalRemoteSessionPlanStore(),
+                    new HttpRemoteSessionPlanStore(remoteBaseUrl()),
                     connectivityMonitor,
                     Clock.systemUTC(),
                     syncLogStore);
@@ -59,6 +59,14 @@ public final class App {
             DesktopShellFrame frame = new DesktopShellFrame(controller);
             frame.setVisible(true);
         });
+    }
+
+    private static String remoteBaseUrl() {
+        String configured = System.getProperty("stemmate.remote.baseUrl");
+        if (configured == null || configured.isBlank()) {
+            configured = System.getenv("STEMMATE_REMOTE_BASE_URL");
+        }
+        return configured == null || configured.isBlank() ? "http://localhost:9090" : configured;
     }
 
     private static List<Activity> seedActivities() {

@@ -1,0 +1,27 @@
+version: 1
+document: spec-to-plan
+requirements:
+  - id: FR1
+    plan_items: [P6.1]
+  - id: FR2
+    plan_items: [P6.1]
+  - id: FR3
+    plan_items: [P1.1, P2.1, P3.1]
+  - id: FR4
+    plan_items: [P1.1, P2.1, P3.1]
+  - id: FR5
+    plan_items: [P3.1, P4.1, P5.1]
+  - id: FR6
+    plan_items: [P4.1, P5.1]
+  - id: FR7
+    plan_items: [P6.1]
+  - id: FR8
+    plan_items: [P6.1]
+  - id: QR1
+    plan_items: [P2.1, P3.1, P4.1, P5.1]
+  - id: QR2
+    plan_items: [P1.1, P4.1, P5.1]
+  - id: SUS1
+    plan_items: [P3.1, P4.1, P5.1]
+  - id: AC1
+    plan_items: [P5.1]

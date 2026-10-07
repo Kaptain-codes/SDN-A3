@@ -1,0 +1,186 @@
+metadata:
+  generated: "2026-10-07"
+  source_tasks: "plan.md"
+  last_updated: "2026-10-07"
+summary:
+  total_tasks: 15
+  completed_tasks: 10
+  in_progress_tasks: 0
+  pending_tasks: 4
+  completion_percentage: 66.7
+tasks:
+  - task_id: T001
+    description: "Document the session-plan batch contract"
+    status: completed
+    implementation:
+      files_changed: [docs/api/endpoints.md]
+    verification:
+      build_passed: true
+      notes: "Contract and error mapping documented."
+    upstream_trace:
+      plan_item: "1.1"
+      requirements: [FR3, FR4, FR5, FR6, QR1, QR2, SUS1]
+  - task_id: T002
+    description: "Add non-secret configuration examples"
+    status: completed
+    implementation:
+      files_changed: [server/Config.toml.example]
+    verification:
+      build_passed: true
+      notes: "Example contains no credentials intended for deployment."
+    upstream_trace:
+      plan_item: "1.1"
+      requirements: [QR2]
+  - task_id: T003
+    description: "Create Ballerina project manifest and service layout"
+    status: completed
+    implementation:
+      files_changed: [server/Ballerina.toml, server/service.bal]
+    verification:
+      build_passed: false
+      notes: "Ballerina CLI unavailable in the implementation environment."
+    upstream_trace:
+      plan_item: "2.1"
+      requirements: [FR5, QR1]
+  - task_id: T004
+    description: "Implement backend payload validation"
+    status: completed
+    implementation:
+      files_changed: [server/service.bal]
+    verification:
+      build_passed: false
+      notes: "Static implementation only; Ballerina compiler unavailable."
+    upstream_trace:
+      plan_item: "2.1"
+      requirements: [FR4, QR1]
+  - task_id: T005
+    description: "Implement PostgreSQL upsert storage"
+    status: completed
+    implementation:
+      files_changed: [server/service.bal, db/postgres/schema.sql]
+    verification:
+      build_passed: false
+      notes: "SQL reviewed against the repository schema; database runtime not available."
+    upstream_trace:
+      plan_item: "2.1"
+      requirements: [FR5, QR1]
+  - task_id: T006
+    description: "Implement POST /plans and GET /sync/health"
+    status: completed
+    implementation:
+      files_changed: [server/service.bal]
+    verification:
+      build_passed: false
+      notes: "Endpoint source added; runtime probe pending Ballerina installation."
+    upstream_trace:
+      plan_item: "2.1"
+      requirements: [FR5, QR1, SUS1]
+  - task_id: T007
+    description: "Add Java HTTP remote repository adapter"
+    status: completed
+    implementation:
+      files_changed: [client/src/main/java/org/stemmate/repository/HttpRemoteSessionPlanStore.java]
+    verification:
+      build_passed: true
+      test_results:
+        command: "mvn -q -f client/pom.xml test"
+        passed: 0
+        failed: 0
+        skipped: 0
+        failures: []
+    upstream_trace:
+      plan_item: "3.1"
+      requirements: [FR5, QR1, QR2, SUS1]
+  - task_id: T008
+    description: "Wire HTTP adapter into production bootstrap"
+    status: completed
+    implementation:
+      files_changed: [client/src/main/java/org/stemmate/App.java]
+    verification:
+      build_passed: true
+    upstream_trace:
+      plan_item: "4.1"
+      requirements: [FR5, QR1]
+  - task_id: T009
+    description: "Add Java HTTP adapter tests"
+    status: pending
+    implementation: {}
+    verification:
+      build_passed: false
+      notes: "Not added because the project has no test dependency or existing test source tree; requires a deliberate Maven test-framework decision."
+    upstream_trace:
+      plan_item: "3.1"
+      requirements: [FR5, QR1, SUS1]
+  - task_id: T010
+    description: "Add Ballerina service tests"
+    status: pending
+    implementation: {}
+    verification:
+      build_passed: false
+      notes: "Blocked by missing Ballerina CLI and PostgreSQL test runtime."
+    upstream_trace:
+      plan_item: "2.1"
+      requirements: [FR4, FR5, QR1]
+  - task_id: T011
+    description: "Add end-to-end sync test"
+    status: pending
+    implementation: {}
+    verification:
+      build_passed: false
+      notes: "Blocked until Ballerina and PostgreSQL test runtime are available."
+    upstream_trace:
+      plan_item: "4.1"
+      requirements: [FR5, QR1, QR2, SUS1]
+  - task_id: T012
+    description: "Verify PostgreSQL and Ballerina startup"
+    status: pending
+    implementation: {}
+    verification:
+      build_passed: false
+      notes: "Ballerina and PostgreSQL executables were not available."
+    upstream_trace:
+      plan_item: "5.1"
+      requirements: [FR5, QR1]
+  - task_id: T013
+    description: "Document operational recovery"
+    status: completed
+    implementation:
+      files_changed: [docs/supportability.md, docs/api/endpoints.md]
+    verification:
+      build_passed: true
+    upstream_trace:
+      plan_item: "5.1"
+      requirements: [QR1, QR2, SUS1]
+  - task_id: T014
+    description: "Verify desktop sync status behavior"
+    status: completed
+    implementation:
+      files_changed: [client/src/main/java/org/stemmate/ui/SyncStatusBar.java, client/src/main/java/org/stemmate/ui/DesktopShellFrame.java]
+    verification:
+      build_passed: true
+      notes: "Status messages, retry action state, saved-plan labels, and accessibility metadata updated; live visual verification remains recommended."
+    upstream_trace:
+      plan_item: "4.1"
+      requirements: [QR2, SUS1, AC1]
+  - task_id: T015
+    description: "Review deferred scope and privacy constraints"
+    status: completed
+    implementation:
+      files_changed: [client/src/main/java/org/stemmate/repository/HttpRemoteSessionPlanStore.java, server/service.bal]
+    verification:
+      build_passed: true
+      notes: "No authentication, session parameters, or pupil-identifying fields added."
+    upstream_trace:
+      plan_item: "6.1"
+      requirements: [FR1, FR2, FR7, FR8]
+pending_tasks: [T009, T010, T011, T012]
+untracked_changes:
+  - file: "db/postgres/schema.sql"
+    concern: "Schema extension is directly coupled to remote plan persistence."
+validation:
+  passed: false
+  errors: []
+  warnings:
+    - "Ballerina CLI and PostgreSQL runtime were unavailable; backend compilation and end-to-end behavior remain unverified."
+  blocking_issues:
+    - "Install/configure Ballerina and PostgreSQL, then run server compilation and endpoint/integration tests."
