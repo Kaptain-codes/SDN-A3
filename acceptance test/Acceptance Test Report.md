@@ -94,7 +94,7 @@ The FR1 findings from Run 2 were traced to two defects and fixed in the selected
 1. **Duration boundary:** `LocalActivityStore` treated the maximum as inclusive (`duration <= maximum`), conflicting with the UI label “Under N mins.” It now uses a strict upper bound (`duration < maximum`). The rebuilt class bytecode was inspected and contains the strict comparison.
 2. **Search field hidden:** `CatalogPanel` added both the title/search header and filter card to the same `BorderLayout.NORTH` region. Swing replaced the first component, leaving the search input (and catalogue heading) hidden. The two panels now sit in a single vertically stacked header container.
 
-**Build verification:** `mvn -Dmaven.repo.local=C:\Users\wykva\.m2\repository -f client\pom.xml -DskipTests package` completed with **BUILD SUCCESS**. The client has no test sources under `client/src/test`, and this build skipped tests. The active user client was left untouched because it already contains an unsynced plan; a separate client launch used a temporary database and was stopped, but its window was not exposed for UI inspection. Therefore these fixes are compile-verified and the duration comparison is bytecode-verified, but **the post-fix visual acceptance check is still pending**. Restart the client from the rebuilt artifact and rerun AT-FR1 to confirm the boundary and that the search box is visible and filters results.
+**Build verification:** `mvn -Dmaven.repo.local=C:\Users\wykva\.m2\repository -f client\pom.xml -DskipTests package` completed with **BUILD SUCCESS**. At that point, no client test sources existed; regression tests were subsequently added and are recorded below. The active user client was left untouched because it already contains an unsynced plan; a separate client launch used a temporary database and was stopped, but its window was not exposed for UI inspection. Therefore these fixes are compile-verified and the duration comparison is bytecode-verified, but **the post-fix visual acceptance check is still pending**. Restart the client from the rebuilt artifact and rerun AT-FR1 to confirm the boundary and that the search box is visible and filters results.
 
 ### Loop check — 2026-11-06 21:15 UTC
 
@@ -114,3 +114,10 @@ Added a second regression test for the catalogue header composition: `DesktopShe
 - Server test phase: **BUILD SUCCESS** (server module still has no test sources).
 - Server checks: `/health` and `/activities` returned HTTP 200; the read-only plan probe returned HTTP 200 with an empty body.
 - Repeat check: no new issue in touched-code whitespace checks. Full visual check still requires restarting the client with the rebuilt code; the active unsynced plan was not touched.
+
+### Resumed loop check — 2026-11-06 21:32 UTC
+
+- Client tests: **2 passed, 0 failed, 0 errors**.
+- Server Maven test phase: **BUILD SUCCESS**; no server test sources exist.
+- The usual server endpoint at `http://localhost:8080` was down. Started the built server on port 8081 with a fresh database in the system temporary folder; `/health`, `/activities`, and `/plans?deviceId=acceptance-loop-probe` each returned HTTP 200. The temporary server was stopped after the checks; the user database and pending plan were untouched.
+- No new failing test or source defect appeared. Visual FR1 confirmation still awaits a restart of the user’s client.
