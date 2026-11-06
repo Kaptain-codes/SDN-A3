@@ -9,3 +9,7 @@ client/dependency-reduced-pom.xml
 .vscode/
 
 client/STEMCraft-demo.zip
+server/target/
+stemmate.db*
+out/
+.DS_Store
