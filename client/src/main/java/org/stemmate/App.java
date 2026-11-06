@@ -2,8 +2,8 @@ package org.stemmate;
 
 import org.stemmate.connectivity.ConnectivityMonitor;
 import org.stemmate.model.Activity;
-import org.stemmate.model.EquipmentKitRecord;
-import org.stemmate.model.InclusionPrompt;
+// import org.stemmate.model.EquipmentKitRecord;
+// import org.stemmate.model.InclusionPrompt;
 import org.stemmate.model.Material;
 import org.stemmate.model.PlanStep;
 import org.stemmate.model.SafetyNote;
@@ -16,6 +16,7 @@ import org.stemmate.store.LocalEquipmentKitStore;
 import org.stemmate.store.LocalOutboxRepository;
 import org.stemmate.store.LocalSessionPlanStore;
 import org.stemmate.store.LocalSyncLogStore;
+import org.stemmate.store.SqliteDatabase;
 import org.stemmate.sync.SyncManager;
 import org.stemmate.ui.AppTheme;
 import org.stemmate.ui.DesktopShellFrame;
@@ -33,9 +34,14 @@ public final class App {
     public static void main(String[] args) {
         AppTheme.install();
         SwingUtilities.invokeLater(() -> {
-            LocalActivityStore activityStore = new LocalActivityStore(seedActivities());
-            LocalOutboxRepository outboxRepository = new LocalOutboxRepository();
-            LocalSessionPlanStore sessionPlanStore = new LocalSessionPlanStore(outboxRepository);
+            List<Activity> activities = seedActivities();
+            SqliteDatabase database = new SqliteDatabase();
+            activities.forEach(database::cacheActivity);
+            LocalActivityStore activityStore = new LocalActivityStore(activities);
+            // Keep plan and outbox operations on the same SQLite connection so the
+            // local plan write and its queue record share one transaction boundary.
+            LocalOutboxRepository outboxRepository = new LocalOutboxRepository(database);
+            LocalSessionPlanStore sessionPlanStore = new LocalSessionPlanStore(database, outboxRepository);
             LocalEquipmentKitStore kitStore = new LocalEquipmentKitStore();
             LocalSyncLogStore syncLogStore = new LocalSyncLogStore();
             ConnectivityMonitor connectivityMonitor = new ConnectivityMonitor(true);
@@ -62,11 +68,11 @@ public final class App {
     }
 
     private static String remoteBaseUrl() {
-        String configured = System.getProperty("stemmate.remote.baseUrl");
+        String configured = System.getProperty("stemmate.server.url");
         if (configured == null || configured.isBlank()) {
-            configured = System.getenv("STEMMATE_REMOTE_BASE_URL");
+            configured = System.getenv("STEMMATE_SERVER_URL");
         }
-        return configured == null || configured.isBlank() ? "http://localhost:9090" : configured;
+        return configured == null || configured.isBlank() ? "http://localhost:8080" : configured;
     }
 
     private static List<Activity> seedActivities() {

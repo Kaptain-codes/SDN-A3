@@ -59,12 +59,12 @@ public class Server {
             if (method.equals("GET") && path.equals("/health")) {
                 reply(ex, 200, "status=OK");
             } else if (method.equals("GET") && path.equals("/activities")) {
-                reply(ex, 200, encodeAll(db.query("SELECT * FROM activity ORDER BY id")));
+                reply(ex, 200, encodeAll(db.query("SELECT * FROM activities ORDER BY activity_id")));
             } else if (method.equals("GET") && path.equals("/plans")) {
                 String deviceId = params.get("deviceId");
                 List<Map<String, String>> rows = (deviceId == null)
-                        ? db.query("SELECT * FROM plan ORDER BY updated_at DESC")
-                        : db.query("SELECT * FROM plan WHERE device_id = ? ORDER BY updated_at DESC", deviceId);
+                        ? db.query("SELECT * FROM session_plans ORDER BY updated_at DESC")
+                        : db.query("SELECT sp.* FROM session_plans sp JOIN session_plan_devices d ON d.plan_id = sp.plan_id WHERE d.device_id = ? ORDER BY sp.updated_at DESC", deviceId);
                 reply(ex, 200, encodeAll(rows));
             } else if (method.equals("POST") && path.equals("/sync")) {
                 handleSync(ex, params.get("deviceId"));

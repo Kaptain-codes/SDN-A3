@@ -1,6 +1,6 @@
 # Accessibility plan
 
-This checklist targets WCAG 2.2 AA behaviors in the Swing client.
+This checklist applies to the selected rich Swing client in `client/`. The historical issue table below describes earlier work and is not a verification result for the current A4 build. Run and record each applicable check on this client before claiming AC1. QR3 phone accessibility remains untested while mobile support is unfinished.
 
 | Check | Implementation | Test |
 |---|---|---|

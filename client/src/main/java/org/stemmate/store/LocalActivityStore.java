@@ -100,7 +100,7 @@ public final class LocalActivityStore implements ActivityRepository {
     }
 
     private static boolean matchesDuration(Integer maximumDurationMinutes, int durationMinutes) {
-        return maximumDurationMinutes == null || durationMinutes <= maximumDurationMinutes;
+        return maximumDurationMinutes == null || durationMinutes < maximumDurationMinutes;
     }
 
     private static boolean matchesMaterials(List<String> requestedNames, List<Material> materials) {

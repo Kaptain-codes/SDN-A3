@@ -1,15 +1,15 @@
-# Simulation strategy
+# A4 selected demonstrator: real and simulated behavior
 
-The prototype has an explicit offline/online toggle that is the deterministic implementation of `ConnectivityMonitor`. Toggling offline prevents remote calls; toggling online notifies `SyncManager` to process at most 20 outbox records. A `FakeRemoteSessionPlanStore` accepts a configured success/failure mode so the demo can show both confirmation and retry without depending on live infrastructure.
-
-The seed catalogue contains about 15 synthetic activities. No real people, pupils, credentials, or identifying fields are used.
-
-| Area | Real in the prototype | Simulated |
+| Area | Real in selected slice | Simulated / not implemented |
 |---|---|---|
-| Connectivity | Client toggle and status shown in text | Internet availability |
-| Outbox and status | SQLite persistence and status transitions | None |
-| Server sync | Repository contract and batch/idempotency behavior | Ballerina response and failure injection |
-| Activity cache/filtering | Local catalogue and filtering | Initial catalogue download |
-| Plan builder/save | Form, validation, local-first write | None |
-| Logout warning | Outbox count check | Shared-device session boundary |
-| Failure support | Failure records and help text | Administrator deployment |
+| Connectivity | HTTP client and server are real processes; server returns per-item results | Client Online/Offline toggle represents connectivity; proxy injects delay/drop conditions in resilience checks |
+| Client outbox | File-backed queue with atomic replacement and restart loading | None claimed |
+| Server persistence | SQLite with WAL/FULL settings; operation and sync-log answer committed transactionally | Remote/cloud deployment is not part of the demo |
+| Retry/idempotency | Stable item IDs, server response log, client retry/backoff | Internet quality itself is simulated by proxy |
+| Activity list | Server endpoint returns synthetic seeded activities | Production catalogue and catalogue download lifecycle are not demonstrated |
+| Plan save | UI queues a plan line and server validates/persists title, target, safety and inclusion fields | Full five-element FR4 plan is not supported; steps, timing and materials are absent |
+| Draft autosave | UI timer displays an autosave message | Durable full-draft storage/restore is not implemented by the visible timer |
+| Mobile support | None | Phone client and QR3 phone acceptance are unfinished |
+| Authentication/logout | None | Shared-user identity and unsynced logout warning are not implemented |
+
+The Ballerina/PostgreSQL JSON endpoint and original Swing client are legacy/alternate implementation paths and are excluded from selected-slice claims.

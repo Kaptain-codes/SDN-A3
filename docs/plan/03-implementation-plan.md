@@ -1,5 +1,7 @@
 # Implementation plan
 
+> Historical A3 implementation plan. Tasks describing the original Swing/Ballerina/PostgreSQL architecture are legacy and are not evidence for the selected A4 rich Swing client + thin SQLite server. See `docs/plan/00-context.md` and `docs/traceability.md` for selected A4 scope and status.
+
 Every task is intended to be one small commit. Essential means required for the 2 October delivery.
 
 ## 1. Skeleton and database setup

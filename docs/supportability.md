@@ -1,44 +1,31 @@
-# Supportability guide
+# A4 selected demonstrator: setup and recovery
 
-## User status messages
+This guide covers the selected rich Java Swing client in `client/` and the thin Java server in `server/`. The Role 5 application in `prototype/src` and the Ballerina/PostgreSQL service are legacy prototypes; their test evidence is not evidence for the selected client/server pair.
 
-- **Waiting to sync:** The plan is safely saved on the device and will upload when
-  the connection returns.
-- **Syncing:** The client is sending plans in a small batch.
-- **All changes synced:** The server confirmed the plan.
-- **Sync failed. Retry when online:** The local copy was kept. Restore the connection
-  and retry.
+## Requirements and start
 
-## Administrator sync log
+Use JDK 21 or later and Maven. Build the server:
 
-The local sync log records a failed plan ID, the `FAILED_RETRY` status, the time of
-the attempt, and the plain-language failure message. The log is bounded to the most
-recent 200 entries so it remains suitable for low-resource devices. A support
-administrator should use the plan ID and attempt time when investigating a repeated
-failure; no pupil-identifying data is recorded.
+```powershell
+cd server
+mvn package
+java -jar target/stemmate-server.jar
+```
 
-## Recovery steps
+Build and launch the rich client from `client/` using its Maven project and Java entry point `org.stemmate.App`. The client defaults to `http://localhost:8080`; configure `STEMMATE_SERVER_URL` or `-Dstemmate.server.url` to change it. The server defaults to port 8080 and `stemmate.db` in its working directory; configure `STEMMATE_DB_FILE` and `STEMMATE_PORT` as needed. The client SQLite path can be set with `STEMMATE_SQLITE_PATH` or `-Dstemmate.sqlite.path`; otherwise it uses `~/.stemmate/stemmate.db`.
 
-1. Check the connection status.
-2. Leave the application open while a retry runs.
-3. Confirm that the status changes to **All changes synced**.
-4. If it remains failed, retain the plan ID and message for support.
-# Remote sync service
+Check `GET /health` for `status=OK`. The server creates its schema and synthetic seed data at startup. Back up the stopped server database and client SQLite file together. Do not delete client SQLite while the outbox has unconfirmed work.
 
-The desktop client writes plans and outbox state locally before it calls the
-remote service. Configure the service URL with `STEMMATE_REMOTE_BASE_URL` or
-`-Dstemmate.remote.baseUrl`; the default is `http://localhost:9090`.
+## Storage and sync
 
-Start the Ballerina service from `server/` with a local `Config.toml` copied
-from `Config.toml.example`. Apply `db/postgres/schema.sql` to the configured
-database before starting it. Do not commit `Config.toml` or database
-credentials.
+Client-only SQLite tables contain drafts, outbox records, and local sync status. Shared activity and plan tables use matching definitions on client and server. The server also keeps device associations and idempotent request results. The rich client sends at most 10 plan records per request; the server accepts at most 50 records and a 256 KiB request body.
 
-`POST /plans` accepts at most 20 plans. A `503` response leaves the plan in
-`FAILED_RETRY`; retrying the same `planId` is safe because PostgreSQL
-upserts by `plan_id`. `GET /sync/health` verifies that the service can reach
-PostgreSQL.
+The client presents waiting, syncing, synced, and retry states. If a request fails, unconfirmed work remains in the client database for retry. Check the client status, retain the plan/item ID and error message, confirm `GET /health`, and retry without deleting the local database.
 
-If the service is unavailable, the desktop application still starts and local
-plans remain available. The Sync status bar and local sync log are the source
-of truth for whether a plan is waiting, syncing, synced, or retryable.
+## Known operational limits
+
+This is a local demonstrator, not a secured multi-user deployment. There is no login, encryption/access-control layer, administrator log interface, or warning on logout with unsynced items. Low-spec performance has no agreed measure yet. Use only synthetic data. Phone implementation and acceptance remain unfinished under QR3.
+
+## Legacy notes
+
+`prototype/src`, `server/service.bal`, `db/postgres/schema.sql`, and the JSON `POST /plans` contract are alternative/legacy artifacts. Do not use their test runs as evidence for the selected rich client without rerunning them against this path.

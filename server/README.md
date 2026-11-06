@@ -1,5 +1,7 @@
 # STEMMate Namibia – server (SDN621S A4, Role 5)
 
+> **Selected A4 demonstrator.** This is the official thin SQLite server path. It currently runs on a laptop; QR3 phone support remains unfinished. The server/test notes below document this slice only, not the legacy `client/` + Ballerina/PostgreSQL implementation.
+
 A small **thin server** for the vertical slice: **save offline → "Waiting to Sync" → sync → "Confirmed Result"**.
 The laptop does the work (forms, drafts, the outbox). The server only checks the data, stores it in **SQLite**, and sends back a short answer.
 
@@ -9,6 +11,16 @@ The laptop does the work (forms, drafts, the outbox). The server only checks the
 | Language | Java 21, client and server | One language for the team |
 | Storage | SQLite (one file, `stemmate.db`) | What the A4 brief asks for. No install, no password, works offline |
 | Network | Built for weak or unstable connections | See section 4 |
+
+## Requirement gaps in this prototype
+
+- The activity list is not filterable by all FR1 criteria.
+- `SAVE_OFFLINE` records a server-side device selection; activity content is not cached in the client for offline opening (FR2 gap).
+- The current plan line omits steps, timing and materials (FR4 partial).
+- The 800 ms draft timer changes the badge but does not persist/restore a complete draft (FR6 gap).
+- Phone UI/acceptance, authentication, logout warning, and administrator log UI are not implemented.
+
+Do not describe the slice as completing FR1–FR6. See `docs/traceability.md` for status.
 
 ## Files
 ```

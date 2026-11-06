@@ -1,24 +1,19 @@
-%% View 2: Containers. Purpose: show the main runnable parts and what each stores or calls.
-%% Requirements: FR2, FR5, FR6, QR1, QR2, SUS1. ADR-001 (laptop first), ADR-002 (Java + Swing), ADR-003 (storage, Role 4 package, section 4).
+%% Selected A4 architecture: rich Swing client + thin SQLite server.
 flowchart TB
-  subgraph laptop["Shared Windows laptop"]
-    client["STEMCraft client<br/>Java 17, Swing + FlatLaf<br/>BUILT"]
-    files[("Local store<br/>Java-serialised files in .stemmate<br/>BUILT")]
-    sqlite[("Local SQLite database<br/>schema_Patched.sql<br/>DESIGNED, not connected")]
-    standin["Stand-in remote store<br/>in memory, always confirms<br/>BUILT (simulated)"]
+  subgraph laptop["Laptop: rich client"]
+    ui["DesktopShellFrame<br/>Java Swing"]
+    local[("Client SQLite<br/>plans, drafts, outbox,<br/>activity cache")]
+    adapter["HttpRemoteSessionPlanStore<br/>line protocol, batch 10"]
+    ui --> local
+    local --> adapter
   end
-  subgraph cloud["Server side (not built)"]
-    api["Ballerina API<br/>DESIGNED"]
-    pg[("PostgreSQL<br/>DESIGNED")]
+  subgraph serverhost["Server host"]
+    http["Server.java<br/>GET /health, /activities, /plans<br/>POST /sync (max 50)"]
+    validate["Validator.java"]
+    database["Database.java"]
+    sqlite[("SQLite<br/>shared activities/plans,<br/>device map, sync_log")]
+    http --> validate --> database --> sqlite
   end
-  client -->|"reads and writes first"| files
-  client -.->|"target replacement"| sqlite
-  client -->|"sync batches (max 20)"| standin
-  client -.->|"HTTPS, when online"| api
-  api -.-> pg
-  classDef built fill:#dff0d8,stroke:#3c763d,color:#000
-  classDef designed fill:#fcf8e3,stroke:#8a6d3b,stroke-dasharray:5 5,color:#000
-  class client,files,standin built
-  class sqlite,api,pg designed
-%% Legend: green solid = built; yellow dashed = designed only.
-%% Note: the stand-in store always confirms, so the failure path cannot be shown yet (A3 finding F2).
+  adapter <-->|"HTTP URL-encoded lines"| http
+  legacy["Legacy prototype<br/>prototype/src"] -.-> laptop
+  phone["Mobile client<br/>unfinished (QR3)"] -.-> ui

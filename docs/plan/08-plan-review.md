@@ -1,17 +1,26 @@
-# Plan review
+# A4 plan review
 
-## Findings
+## Selected scope
 
-- The scope is manageable only if FR7 and FR8 remain deferred; their exclusion is explicit in the context and implementation plan.
-- Live infrastructure is not required for the prototype because the local SQLite path and fake remote store demonstrate the resilient workflow. Ballerina/PostgreSQL remain documented integration surfaces.
-- Every implementation task has requirement IDs. The schema baseline and service work should not be started without the contract task.
-- UI code must call services, and services must depend on repository interfaces; concrete stores belong behind adapters.
-- No sign-in or AuthService is part of the prototype. Any future shared-device role work must not add identity fields to these contracts.
-- The design leaves measurable QR2 timing thresholds undefined; the evaluation should record a practical device observation without inventing a new requirement ID.
+- Official demonstrator: Role 5 Java Swing prototype, file outbox, Java thin server and SQLite server database.
+- Legacy/alternate: Role 5 `prototype/src` client and Ballerina/PostgreSQL path. Prototype test results are not part of selected rich-client claims unless rerun against the selected `client/` + `server/` path.
+- Deferred: FR7 and FR8.
+- Unfinished requirement: QR3 remains equal Must for laptop and phone; phone implementation/testing is unfinished.
 
-## Prioritized cut list
+## Current gaps
 
-1. Cut live Ballerina deployment and use the fake remote store if time is constrained; preserve the API contract and tests.
-2. Keep Swing screens minimal and defer visual polish while retaining keyboard, focus, contrast, and text status behavior for AC1.
-3. Keep the sync-failure log as SQLite rows plus a help screen; defer export and administration UI.
-4. Do not implement FR7 or FR8 in the prototype.
+- The selected payload/schema does not persist all five FR4 plan elements.
+- The visible autosave timer does not persist/restore the full FR6 draft.
+- QR2's performance measure and FR5's time limit remain undecided.
+- Authentication, logout warning and administrator UI are absent.
+- Accessibility and phone checks have not been recorded for the selected client.
+- Role 5's README reports useful tests, but their logs should be retained in the hand-in.
+
+## Required follow-up
+
+1. Keep diagrams and setup docs specific to the selected thin SQLite server.
+2. Make the sync limit distinction explicit: client batches 10; server cap 50.
+3. Extend plan payload and SQLite schema before claiming FR4 complete.
+4. Implement durable drafts before claiming FR6 complete.
+5. Keep QR3's phone work marked unfinished until built and tested.
+6. Preserve test output and update all 13 traceability rows with actual results/issues.

@@ -140,6 +140,14 @@ public final class DesktopShellFrame extends JFrame {
         cardLayout.show(content, CARD_CUSTODIAN);
     }
 
+    static JPanel catalogueTop(JPanel header, JPanel filterCard) {
+        JPanel catalogueTop = new JPanel(new BorderLayout(0, 12));
+        catalogueTop.setOpaque(false);
+        catalogueTop.add(header, BorderLayout.NORTH);
+        catalogueTop.add(filterCard, BorderLayout.CENTER);
+        return catalogueTop;
+    }
+
     public void refreshAll() {
         pendingBadge.setText(Integer.toString(controller.pendingCount()));
         pendingPanel.setVisible(controller.pendingCount() > 0);
@@ -387,8 +395,6 @@ public final class DesktopShellFrame extends JFrame {
                 JLabel badge = pillLabel("Storage ready", AppTheme.EMERALD_50, AppTheme.EMERALD_700);
                 header.add(badge, BorderLayout.EAST);
             }
-            add(header, BorderLayout.NORTH);
-
             JPanel filterCard = cardPanel();
             filterCard.setLayout(new GridBagLayout());
             GridBagConstraints c = new GridBagConstraints();
@@ -411,7 +417,7 @@ public final class DesktopShellFrame extends JFrame {
             c.gridy = 1;
             c.gridx = 4;
             filterCard.add(reset, c);
-            add(filterCard, BorderLayout.NORTH);
+            add(catalogueTop(header, filterCard), BorderLayout.NORTH);
 
             grid.setOpaque(false);
             JScrollPane scrollPane = new JScrollPane(grid);

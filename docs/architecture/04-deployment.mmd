@@ -1,26 +1,16 @@
-%% View 4: Deployment. Purpose: show where each part runs and over what link.
-%% Requirements: QR2 (low-spec shared devices, costly data), SUS1 (local support), QR1 (data stays local until confirmed).
+%% Selected rich-client deployment. Phone delivery remains unfinished.
 flowchart LR
-  subgraph node1["Shared Windows laptop (primary device, ADR-001)"]
-    rt["STEMCraft.exe<br/>jpackage bundle, about 47 MB,<br/>own Java runtime"]
-    home[".stemmate folder in the user's home<br/>plans, drafts, outbox, sync log, kits"]
+  subgraph node1["Laptop / client machine"]
+    jvm["Java Swing rich client"]
+    file[("~/.stemmate/stemmate.db<br/>SQLite")]
+    jvm --> file
   end
-  net{{"Intermittent school internet<br/>costly data, small batches only"}}
-  subgraph node2["Remote host (not built)"]
-    api["Ballerina API"]
-    pg[("PostgreSQL")]
+  net{{"HTTP connection<br/>weak/drop-prone network simulated by proxy"}}
+  subgraph node2["Server host"]
+    app["Java thin server<br/>port 8080"]
+    sqlite[("stemmate.db<br/>SQLite WAL + FULL sync")]
+    app --> sqlite
   end
-  subgraph node3["Developer and test machines"]
-    src["GitHub repo Kaptain-codes/SDN-A3<br/>source, schemas, docs"]
-  end
-  rt --- home
-  rt -.-> net
-  net -.-> api
-  api -.-> pg
-  src -.->|"build and release (zip)"| rt
-  classDef built fill:#dff0d8,stroke:#3c763d,color:#000
-  classDef designed fill:#fcf8e3,stroke:#8a6d3b,stroke-dasharray:5 5,color:#000
-  class rt,home,src built
-  class api,pg designed
-%% Legend: green solid = built; yellow dashed = designed only; hexagon = network link.
-%% Delete the .stemmate folder to reset the demo. No sign-in, so anyone on the laptop account can read the plans (A3 pain point 4).
+  phone["Phone"] -.->|"unfinished / not tested"| jvm
+  jvm <-->|"bounded sync batches"| net <-->|""| app
+  legacy["Legacy prototype<br/>prototype/src"] -.-> net

@@ -1,5 +1,7 @@
 # Desktop UI Specification: STEMCraft Facilitator Studio & Kit Manager
 
+> **Selected desktop UI reference.** This document describes the rich Swing app in `client/`, now selected with the A4 thin SQLite server. It does not establish QR3 or AC1: phone support remains unfinished and accessibility checks require verification. Use `docs/architecture/architecture-views.md` for the current A4 architecture.
+
 **Target Framework:** Java Swing
 **Architecture:** MVC / MVP (Strict separation of UI from Business Logic)
 **Context:** This application operates in an offline-first environment for STEM facilitators and equipment custodians.

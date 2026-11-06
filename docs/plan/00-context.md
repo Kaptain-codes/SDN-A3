@@ -1,23 +1,33 @@
-# Context
+# A4 context and selected demonstrator
 
-## Stack
+## Product goal
 
-STEMMate is a Java desktop client using the Repository pattern, a Ballerina service, PostgreSQL as the remote database, and SQLite as the local database. The Java package root is `org.stemmate`. The client remains usable without a network connection and synchronises local work in small batches.
+STEMMate helps facilitators find STEM activities and prepare session plans in low-connectivity settings. It uses synthetic demonstration data and stores no learner-identifying data.
 
-## Prototype workflows
+## A4 requirement baseline
 
-1. **Find an activity** — FR1, supported by FR2. Browse the cached catalogue and filter by level, topic, duration, and materials while offline.
-2. **Create and save a session plan** — FR3, FR4, supported by FR6 and QR1. Build a plan with steps, timing, materials, safety notes, and inclusion prompts; autosave drafts and save locally first.
-3. **Offline sync and recovery** — FR5, supported by QR1, QR2, and SUS1. Queue offline plans, synchronise on reconnect, retry failures, and expose a failure log and status help.
+`docs/requirements.md` is the canonical 13-requirement baseline: FR1–FR8, QR1–QR3, SUS1 and AC1. QR3 requires the FR1–FR6 workflows to have equal Must priority on laptop/desktop and mobile. The current selected demonstrator is laptop-only; phone delivery and verification are unfinished, so QR3 is not yet met. FR7 and FR8 are deferred in the selected slice.
 
-## Out of scope
+## Official A4 vertical slice
 
-FR7 equipment-kit records and FR8 plan duplication are deferred. The prototype has no sign-in, AuthService, session parameters, or pupil-identifying data. Data is synthetic.
+Use the rich Java Swing application in `client/` with the thin Java SQLite server in `server/`:
 
-## Ambiguities found
+1. The rich client provides activity filters and a five-element plan editor.
+2. Client SQLite stores plans, drafts, and the sync outbox; the shared activity/plan schema is aligned with the server.
+3. `HttpRemoteSessionPlanStore` sends URL-encoded plan records to `POST /sync` in batches of 10.
+4. The server validates requests and stores shared plans and idempotent responses in SQLite (default `stemmate.db` in the server working directory).
+5. Unconfirmed client outbox items remain local for retry.
 
-- The design document leaves the QR2 load-time and sync-time targets to be defined.
-- The design mentions role-based access and logout warnings, but authentication is explicitly outside this prototype; only the unsynchronised-item warning is actionable.
-- The source design describes a remote store as simulated for the prototype, while the target architecture includes a Ballerina API and PostgreSQL.
-- The requirements source has a truncated FR4 acceptance sentence; the design document supplies the complete five-element interpretation.
-- The existing UI is an HTML prototype, while the target client is a Java desktop application; this plan treats the HTML as design reference rather than the implementation toolkit.
+This is a prototype, not a production deployment. The activity catalogue is not yet loaded from persistent SQLite, client/server activity IDs conflict, and end-to-end sync plus draft restart behavior remain to be verified.
+
+## Legacy paths
+
+The selected A4 implementation combines the rich Java Swing client in `client/` with the thin Java SQLite server in `server/`. The Role 5 vertical-slice client in `prototype/src` and the Ballerina/PostgreSQL service are legacy alternatives. Shared activity/plan schemas and the rich client’s SQLite plan/draft/outbox path have been aligned, but end-to-end behavior and migration variants still require verification.
+
+## Other constraints and unresolved measures
+
+- No authentication or account/session model is included. The selected rich client has no logout warning.
+- FR5 sync-time limit and QR2 low-spec performance measure remain unresolved; do not invent thresholds.
+- Connectivity toggle is a deterministic simulation. Tests through a proxy may simulate delay/drop behavior while using a real local server and database.
+- Mobile support is unfinished; no phone acceptance test is claimed.
+- Accessibility must be evaluated against the actual selected rich client, not inferred from historical checklist entries.

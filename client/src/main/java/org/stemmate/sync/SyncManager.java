@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  * Synchronizes locally saved plans in bounded batches and preserves failures for retry.
  */
 public final class SyncManager {
-    public static final int MAX_BATCH_SIZE = 20;
+    public static final int MAX_BATCH_SIZE = 10;
 
     private final SessionPlanRepository planRepository;
     private final OutboxRepository outboxRepository;

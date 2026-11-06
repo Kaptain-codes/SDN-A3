@@ -1,69 +1,20 @@
-%% View 3: Components inside the STEMCraft client. Purpose: show layers and dependencies.
-%% Requirements: FR1-FR8, QR1 (local first), SUS1 (sync log). Arrows checked against the imports and App.java at commit 28fef52.
+%% Components of the selected rich client and thin SQLite server.
 flowchart TB
-  app["App<br/>composition root: creates the stores,<br/>services, controller and window"]
-  subgraph ui["UI layer"]
-    shell["DesktopShellFrame<br/>screens, role switch"]
-    bar["SyncStatusBar<br/>Online/Offline, pending count"]
-    theme["AppTheme, ThemeComponents, RoundedBorder"]
+  subgraph client["Java Swing client: client/src"]
+    screen["DesktopShellFrame + DesktopController<br/>catalogue + planner UI"]
+    stores["LocalSessionPlanStore + LocalOutboxRepository<br/>drafts, plans, retry state"]
+    sqlite[("SqliteDatabase<br/>shared tables + local-only tables")]
+    adapter["HttpRemoteSessionPlanStore<br/>line protocol, batch=10"]
+    screen --> stores --> sqlite
+    stores --> adapter
   end
-  ctrl["DesktopController<br/>wires the UI to the services"]
-  subgraph svc["Service layer (business logic and validation)"]
-    cat["ActivityCatalogueService<br/>FR1, FR2"]
-    plan["SessionPlanService<br/>FR3, FR4, FR6, FR8"]
-    kit["EquipmentKitService<br/>FR7"]
+  subgraph service["Thin server: server/src/main/java/stemmate/server"]
+    http["Server.java<br/>HTTP routing"]
+    validator["Validator.java<br/>plan/input checks"]
+    db["Database.java<br/>transactions, idempotency,<br/>last-write-wins"]
+    schema[("SQLite<br/>shared activities/plans,<br/>device mapping, sync_log")]
+    http --> validator --> db --> schema
   end
-  sync["SyncManager<br/>batches of 20, retry<br/>FR5, QR1, QR2"]
-  conn["ConnectivityMonitor<br/>Online/Offline switch"]
-  subgraph repo["Repository interfaces"]
-    r1["ActivityRepository"]
-    r2["SessionPlanRepository"]
-    r3["OutboxRepository"]
-    r4["SyncLogRepository"]
-    r5["EquipmentKitRepository"]
-    r6["RemoteSessionPlanStore"]
-  end
-  subgraph store["Implementations (files today, SQLite is the target)"]
-    stAct["LocalActivityStore"]
-    stPlan["LocalSessionPlanStore"]
-    stOut["LocalOutboxRepository"]
-    stLog["LocalSyncLogStore"]
-    stKit["LocalEquipmentKitStore"]
-    stRem["LocalRemoteSessionPlanStore<br/>simulated server"]
-    fss["FileStoreSupport<br/>reads and writes the .stemmate files"]
-    mem["InMemoryDraftStore<br/>unused alternative"]
-  end
-  app --> shell
-  app --> ctrl
-  shell --> ctrl
-  shell --> bar
-  shell --> theme
-  ctrl --> cat
-  ctrl --> plan
-  ctrl --> kit
-  ctrl --> sync
-  ctrl --> conn
-  sync --> conn
-  cat --> r1
-  plan --> r2
-  kit --> r5
-  sync --> r3
-  sync --> r2
-  sync --> r4
-  sync --> r6
-  stAct -.->|implements| r1
-  stPlan -.->|implements| r2
-  stOut -.->|implements| r3
-  stLog -.->|implements| r4
-  stKit -.->|implements| r5
-  stRem -.->|implements| r6
-  mem -.->|implements| r2
-  stPlan -->|"queues a record when a plan is finalised"| stOut
-  stAct --> fss
-  stPlan --> fss
-  stOut --> fss
-  stLog --> fss
-  stKit --> fss
-%% Legend: solid arrows point from a class to the class it uses; dashed arrows mean "implements".
-%% Note: SessionPlanService depends only on SessionPlanRepository; the outbox record is created inside LocalSessionPlanStore, which uses the concrete LocalOutboxRepository.
-%% Gap: few accessible names are set in the UI (AC1); there is no sign-in or close warning (QR2).
+  adapter <-->|"GET /activities, GET /plans,<br/>POST /sync"| http
+  phone["Mobile implementation<br/>not present"] -.->|"QR3 incomplete"| screen
+  legacy["prototype/src Role 5 slice"] -.->|"legacy prototype"| client
