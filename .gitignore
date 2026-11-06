@@ -7,3 +7,8 @@ client/dependency-reduced-pom.xml
 
 .idea/
 .vscode/
+
+server/target/
+stemmate.db*
+out/
+.DS_Store
