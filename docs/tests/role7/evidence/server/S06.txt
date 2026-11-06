@@ -1,0 +1,6 @@
+Observed: missing four FR4 elements; validation problems=[]
+java.lang.AssertionError: Server accepts a plan missing steps, timing, materials and inclusion
+	at stemmate.server.TestHarness.require(TestHarness.java:16)
+	at stemmate.server.Role7ServerTests.lambda$cases$8(Role7ServerTests.java:20)
+	at stemmate.server.TestHarness.run(TestHarness.java:32)
+	at stemmate.server.Role7ServerTests.main(Role7ServerTests.java:28)

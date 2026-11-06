@@ -1,0 +1,7 @@
+Observed: stored state=SYNCING; retry queue size=0
+java.lang.AssertionError: Interrupted item must be retryable; expected=1; actual=0
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.TestHarness.equal(TestHarness.java:18)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$36(Role7ClientTests.java:89)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)

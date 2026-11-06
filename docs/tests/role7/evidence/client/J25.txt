@@ -1,0 +1,6 @@
+Observed: setLabelFor bindings=0; named sync/list controls exist but do not bind planner field labels
+java.lang.AssertionError: No setLabelFor association is present in DesktopShellFrame
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$38(Role7ClientTests.java:91)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)

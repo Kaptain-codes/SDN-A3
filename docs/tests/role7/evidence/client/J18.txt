@@ -1,0 +1,6 @@
+Observed: confirmed=[20000000-0000-0000-0000-000000000001]
+java.lang.AssertionError: A rejected plan was returned as confirmed
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$26(Role7ClientTests.java:79)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)

@@ -1,0 +1,7 @@
+Could not save outbox: /workspace/scratch/e3fc6232dd39/work/java_repo/SDN-A3-main/target/role7-cases-7877260011957534989/P04/.stemmate
+Observed: save returned to caller without throwing=true
+java.lang.AssertionError: Outbox.save only prints the write failure and returns normally; caller receives no failure signal
+	at TestHarness.require(TestHarness.java:16)
+	at Role7PrototypeTests.lambda$cases$3(Role7PrototypeTests.java:14)
+	at TestHarness.run(TestHarness.java:32)
+	at Role7PrototypeTests.main(Role7PrototypeTests.java:16)

@@ -1,0 +1,12 @@
+PASS S01 Server accepts a valid synthetic plan
+PASS S02 Server rejects blank identity title and safety
+PASS S03 Server enforces the 120 character title limit
+PASS S04 Server rejects invalid update timestamps
+PASS S05 Server rejects a malformed activity ID
+FAIL S06 Server checks every FR4 element
+PASS S07 Server line codec preserves special characters
+PASS S08 Health route returns its documented status
+PASS S09 Sync route rejects invalid device ID
+PASS S10 Sync route rejects an oversized body
+FAIL S11 Java server supports the desktop upload route
+9 passed; 2 failed; 11 executed

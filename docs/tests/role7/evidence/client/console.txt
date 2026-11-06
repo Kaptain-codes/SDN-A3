@@ -1,0 +1,26 @@
+PASS J01 Combined catalogue filters
+PASS J02 Offline activity selection persists
+PASS J03 Draft is created from the selected activity
+PASS J04 A valid plan is saved and queued
+PASS J05 Blank title is rejected
+PASS J06 Missing required plan elements are rejected
+PASS J07 Negative and mismatched timing are rejected
+PASS J08 Incomplete draft can be autosaved and restored
+PASS J09 Plan draft and outbox survive a real JVM restart
+PASS J10 Saving the same plan ID is idempotent locally
+PASS J11 Offline state prevents remote calls
+PASS J12 Reconnect synchronises a queued plan
+PASS J13 Failure retains data logs the error and permits retry
+PASS J14 Only acknowledged plans are confirmed
+PASS J15 Sync batches are bounded at twenty
+FAIL J16 HTTP payload quotes scalar JSON strings
+PASS J17 Valid acknowledgement IDs are parsed
+FAIL J18 Rejected acknowledgement IDs must not be accepted
+PASS J19 HTTP failure becomes a retryable network error
+PASS J20 Oversized HTTP batch is rejected before send
+FAIL J21 Failed plan write must not leave an orphan outbox
+FAIL J22 Wrong stored object type is handled on load
+FAIL J23 Whitespace safety content is rejected
+FAIL J24 Interrupted SYNCING record remains retryable after reload
+FAIL J25 Swing form labels have explicit label bindings
+18 passed; 7 failed; 25 executed

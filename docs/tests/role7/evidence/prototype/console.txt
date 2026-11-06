@@ -1,0 +1,5 @@
+PASS P01 Prototype line codec preserves plan text
+PASS P02 Prototype outbox writes and reloads exact lines
+PASS P03 Prototype outbox survives a real JVM restart
+FAIL P04 Outbox write failure reaches its caller
+3 passed; 1 failed; 4 executed

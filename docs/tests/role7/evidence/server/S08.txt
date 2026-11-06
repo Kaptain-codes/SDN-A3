@@ -1,0 +1,2 @@
+Observed: status=200; body=status=OK
+PASS S08

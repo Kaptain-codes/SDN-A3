@@ -1,0 +1,6 @@
+Observed: desktop uses POST /plans; Java server returned 404; status=ERROR&message=Not+found%3A+POST+%2Fplans
+java.lang.AssertionError: Desktop client POST /plans is unsupported by the supplied Java server; prototype/src uses a different /sync protocol
+	at stemmate.server.TestHarness.require(TestHarness.java:16)
+	at stemmate.server.Role7ServerTests.lambda$cases$13(Role7ServerTests.java:25)
+	at stemmate.server.TestHarness.run(TestHarness.java:32)
+	at stemmate.server.Role7ServerTests.main(Role7ServerTests.java:28)

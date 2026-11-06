@@ -1,0 +1,2 @@
+Observed: two lines persisted and restored
+PASS P02

@@ -1,0 +1,2 @@
+Observed: negative and mismatched timings rejected
+PASS J07

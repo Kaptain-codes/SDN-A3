@@ -1,0 +1,5 @@
+java.lang.AssertionError: Expected ValidationException but no exception was raised
+	at org.stemmate.testing.TestHarness.expect(TestHarness.java:25)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$35(Role7ClientTests.java:87)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)

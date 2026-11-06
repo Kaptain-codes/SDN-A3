@@ -1,0 +1,3 @@
+Observed: write process: wrote complete plan, draft, outbox and offline mark
+Observed: read process: verified exact complete plan, draft, pending outbox and offline mark in a new JVM
+PASS J09

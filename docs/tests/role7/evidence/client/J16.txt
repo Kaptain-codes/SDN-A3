@@ -1,0 +1,6 @@
+Observed: request body={"plans":[{"planId":20000000-0000-0000-0000-000000000001,"activityId":10000000-0000-0000-0000-000000000001,"title":Synthetic water plan,"targetGroup":Grade 7,"createdAt":2026-11-06T19:00:00Z,"updatedAt":2026-11-06T19:00:00Z,"steps":[{"instruction":"Build filter","durationMinutes":30,"description":"Compare layers"}],"timingMinutes":[30],"materials":[{"name":"Bottle","quantity":"1"}],"safetyNotes":["Do not drink the water"],"inclusionPrompts":["Picture instructions"]}]}
+java.lang.AssertionError: planId is not a quoted JSON string
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$24(Role7ClientTests.java:75)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)

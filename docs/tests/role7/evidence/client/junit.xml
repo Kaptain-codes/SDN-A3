@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.stemmate.testing.Role7ClientTests" tests="25" failures="7" timestamp="2026-11-06T19:43:39.849425623Z">
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J01 Combined catalogue filters" time="0.100349117"><system-out>Observed: matching=1; 29-minute limit excludes 30-minute activity
+PASS J01
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J02 Offline activity selection persists" time="0.128361453"><system-out>Observed: offline mark restored from activity-offline.ser
+PASS J02
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J03 Draft is created from the selected activity" time="0.105512527"><system-out>Observed: draft activity=10000000-0000-0000-0000-000000000001; steps=1
+PASS J03
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J04 A valid plan is saved and queued" time="0.163312564"><system-out>Observed: plan and outbox record saved; state=WAITING_TO_SYNC
+PASS J04
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J05 Blank title is rejected" time="0.072070596"><system-out>Observed: blank title rejected before persistence
+PASS J05
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J06 Missing required plan elements are rejected" time="0.062743771"><system-out>Observed: five missing-element variants rejected
+PASS J06
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J07 Negative and mismatched timing are rejected" time="0.068750485"><system-out>Observed: negative and mismatched timings rejected
+PASS J07
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J08 Incomplete draft can be autosaved and restored" time="0.218637804"><system-out>Observed: empty-title draft restored from drafts.ser
+PASS J08
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J09 Plan draft and outbox survive a real JVM restart" time="0.376878885"><system-out>Observed: write process: wrote complete plan, draft, outbox and offline mark
+Observed: read process: verified exact complete plan, draft, pending outbox and offline mark in a new JVM
+PASS J09
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J10 Saving the same plan ID is idempotent locally" time="0.108868697"><system-out>Observed: plans=1; outbox=1
+PASS J10
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J11 Offline state prevents remote calls" time="0.090412989"><system-out>Observed: remote calls=0; pending=1
+PASS J11
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J12 Reconnect synchronises a queued plan" time="0.107115772"><system-out>Observed: reconnect calls=1; state=SYNCED
+PASS J12
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J13 Failure retains data logs the error and permits retry" time="0.149184772"><system-out>Observed: FAILED_RETRY persisted; one failure log; successful retry; plans=1
+PASS J13
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J14 Only acknowledged plans are confirmed" time="0.129870693"><system-out>Observed: acknowledged=SYNCED; unconfirmed=FAILED_RETRY
+PASS J14
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J15 Sync batches are bounded at twenty" time="0.440163903"><system-out>Observed: batch sizes=[20, 20, 5]; saved plans=45
+PASS J15
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J16 HTTP payload quotes scalar JSON strings" time="0.115030762"><failure message="Assertion or execution failed">Observed: request body={&quot;plans&quot;:[{&quot;planId&quot;:20000000-0000-0000-0000-000000000001,&quot;activityId&quot;:10000000-0000-0000-0000-000000000001,&quot;title&quot;:Synthetic water plan,&quot;targetGroup&quot;:Grade 7,&quot;createdAt&quot;:2026-11-06T19:00:00Z,&quot;updatedAt&quot;:2026-11-06T19:00:00Z,&quot;steps&quot;:[{&quot;instruction&quot;:&quot;Build filter&quot;,&quot;durationMinutes&quot;:30,&quot;description&quot;:&quot;Compare layers&quot;}],&quot;timingMinutes&quot;:[30],&quot;materials&quot;:[{&quot;name&quot;:&quot;Bottle&quot;,&quot;quantity&quot;:&quot;1&quot;}],&quot;safetyNotes&quot;:[&quot;Do not drink the water&quot;],&quot;inclusionPrompts&quot;:[&quot;Picture instructions&quot;]}]}
+java.lang.AssertionError: planId is not a quoted JSON string
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$24(Role7ClientTests.java:75)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</failure><system-out>Observed: request body={&quot;plans&quot;:[{&quot;planId&quot;:20000000-0000-0000-0000-000000000001,&quot;activityId&quot;:10000000-0000-0000-0000-000000000001,&quot;title&quot;:Synthetic water plan,&quot;targetGroup&quot;:Grade 7,&quot;createdAt&quot;:2026-11-06T19:00:00Z,&quot;updatedAt&quot;:2026-11-06T19:00:00Z,&quot;steps&quot;:[{&quot;instruction&quot;:&quot;Build filter&quot;,&quot;durationMinutes&quot;:30,&quot;description&quot;:&quot;Compare layers&quot;}],&quot;timingMinutes&quot;:[30],&quot;materials&quot;:[{&quot;name&quot;:&quot;Bottle&quot;,&quot;quantity&quot;:&quot;1&quot;}],&quot;safetyNotes&quot;:[&quot;Do not drink the water&quot;],&quot;inclusionPrompts&quot;:[&quot;Picture instructions&quot;]}]}
+java.lang.AssertionError: planId is not a quoted JSON string
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$24(Role7ClientTests.java:75)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J17 Valid acknowledgement IDs are parsed" time="0.108500713"><system-out>Observed: accepted ID returned; real HTTP not used
+PASS J17
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J18 Rejected acknowledgement IDs must not be accepted" time="0.109212658"><failure message="Assertion or execution failed">Observed: confirmed=[20000000-0000-0000-0000-000000000001]
+java.lang.AssertionError: A rejected plan was returned as confirmed
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$26(Role7ClientTests.java:79)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</failure><system-out>Observed: confirmed=[20000000-0000-0000-0000-000000000001]
+java.lang.AssertionError: A rejected plan was returned as confirmed
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$26(Role7ClientTests.java:79)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J19 HTTP failure becomes a retryable network error" time="0.109826948"><system-out>Observed: HTTP 503 rejected as a network failure
+PASS J19
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J20 Oversized HTTP batch is rejected before send" time="0.09194961"><system-out>Observed: batch of 21 rejected; transport calls=0
+PASS J20
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J21 Failed plan write must not leave an orphan outbox" time="0.113311749"><failure message="Assertion or execution failed">Observed: durable pending outbox=1; durable plan file is a directory
+java.lang.AssertionError: Orphan durable outbox after failed save; expected=0; actual=1
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.TestHarness.equal(TestHarness.java:18)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$32(Role7ClientTests.java:83)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</failure><system-out>Observed: durable pending outbox=1; durable plan file is a directory
+java.lang.AssertionError: Orphan durable outbox after failed save; expected=0; actual=1
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.TestHarness.equal(TestHarness.java:18)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$32(Role7ClientTests.java:83)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J22 Wrong stored object type is handled on load" time="0.075525798"><failure message="Assertion or execution failed">Observed: java.lang.ClassCastException: Cannot cast java.lang.String to java.util.LinkedHashMap
+java.lang.AssertionError: Unexpected stored object type crashes startup
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$33(Role7ClientTests.java:85)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+Caused by: java.lang.ClassCastException: Cannot cast java.lang.String to java.util.LinkedHashMap
+	at java.base/java.lang.Class.cast(Class.java:4069)
+	at org.stemmate.store.FileStoreSupport.read(FileStoreSupport.java:20)
+	at org.stemmate.store.LocalSessionPlanStore.load(LocalSessionPlanStore.java:143)
+	at org.stemmate.store.LocalSessionPlanStore.&lt;init&gt;(LocalSessionPlanStore.java:38)
+	at org.stemmate.store.LocalSessionPlanStore.&lt;init&gt;(LocalSessionPlanStore.java:33)
+	... 3 more
+</failure><system-out>Observed: java.lang.ClassCastException: Cannot cast java.lang.String to java.util.LinkedHashMap
+java.lang.AssertionError: Unexpected stored object type crashes startup
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$33(Role7ClientTests.java:85)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+Caused by: java.lang.ClassCastException: Cannot cast java.lang.String to java.util.LinkedHashMap
+	at java.base/java.lang.Class.cast(Class.java:4069)
+	at org.stemmate.store.FileStoreSupport.read(FileStoreSupport.java:20)
+	at org.stemmate.store.LocalSessionPlanStore.load(LocalSessionPlanStore.java:143)
+	at org.stemmate.store.LocalSessionPlanStore.&lt;init&gt;(LocalSessionPlanStore.java:38)
+	at org.stemmate.store.LocalSessionPlanStore.&lt;init&gt;(LocalSessionPlanStore.java:33)
+	... 3 more
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J23 Whitespace safety content is rejected" time="0.072678986"><failure message="Assertion or execution failed">java.lang.AssertionError: Expected ValidationException but no exception was raised
+	at org.stemmate.testing.TestHarness.expect(TestHarness.java:25)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$35(Role7ClientTests.java:87)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</failure><system-out>java.lang.AssertionError: Expected ValidationException but no exception was raised
+	at org.stemmate.testing.TestHarness.expect(TestHarness.java:25)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$35(Role7ClientTests.java:87)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J24 Interrupted SYNCING record remains retryable after reload" time="0.132033005"><failure message="Assertion or execution failed">Observed: stored state=SYNCING; retry queue size=0
+java.lang.AssertionError: Interrupted item must be retryable; expected=1; actual=0
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.TestHarness.equal(TestHarness.java:18)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$36(Role7ClientTests.java:89)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</failure><system-out>Observed: stored state=SYNCING; retry queue size=0
+java.lang.AssertionError: Interrupted item must be retryable; expected=1; actual=0
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.TestHarness.equal(TestHarness.java:18)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$36(Role7ClientTests.java:89)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</system-out></testcase>
+<testcase classname="org.stemmate.testing.Role7ClientTests" name="J25 Swing form labels have explicit label bindings" time="0.081962422"><failure message="Assertion or execution failed">Observed: setLabelFor bindings=0; named sync/list controls exist but do not bind planner field labels
+java.lang.AssertionError: No setLabelFor association is present in DesktopShellFrame
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$38(Role7ClientTests.java:91)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</failure><system-out>Observed: setLabelFor bindings=0; named sync/list controls exist but do not bind planner field labels
+java.lang.AssertionError: No setLabelFor association is present in DesktopShellFrame
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$38(Role7ClientTests.java:91)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+</system-out></testcase>
+</testsuite>

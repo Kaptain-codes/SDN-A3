@@ -1,0 +1,2 @@
+Observed: matching=1; 29-minute limit excludes 30-minute activity
+PASS J01

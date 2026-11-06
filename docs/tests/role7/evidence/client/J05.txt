@@ -1,0 +1,2 @@
+Observed: blank title rejected before persistence
+PASS J05

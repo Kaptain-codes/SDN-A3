@@ -1,0 +1,3 @@
+Observed: write: wrote queued item
+Observed: read: verified exact item in a new JVM
+PASS P03

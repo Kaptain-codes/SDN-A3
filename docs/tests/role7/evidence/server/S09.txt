@@ -1,0 +1,2 @@
+Observed: status=400; body=status=ERROR&message=deviceId+is+missing+or+invalid
+PASS S09

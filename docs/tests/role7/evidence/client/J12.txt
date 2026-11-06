@@ -1,0 +1,2 @@
+Observed: reconnect calls=1; state=SYNCED
+PASS J12

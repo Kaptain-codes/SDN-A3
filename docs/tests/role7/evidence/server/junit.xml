@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="stemmate.server.Role7ServerTests" tests="11" failures="2" timestamp="2026-11-06T19:43:43.333471651Z">
+<testcase classname="stemmate.server.Role7ServerTests" name="S01 Server accepts a valid synthetic plan" time="0.071944898"><system-out>Observed: problems=[]
+PASS S01
+</system-out></testcase>
+<testcase classname="stemmate.server.Role7ServerTests" name="S02 Server rejects blank identity title and safety" time="0.056830539"><system-out>Observed: [planId is missing, Plan title is required, Safety controls are required (FR4)]
+PASS S02
+</system-out></testcase>
+<testcase classname="stemmate.server.Role7ServerTests" name="S03 Server enforces the 120 character title limit" time="0.068884324"><system-out>Observed: 120 accepted; 121 rejected
+PASS S03
+</system-out></testcase>
+<testcase classname="stemmate.server.Role7ServerTests" name="S04 Server rejects invalid update timestamps" time="0.049816871"><system-out>Observed: three invalid timestamp values rejected
+PASS S04
+</system-out></testcase>
+<testcase classname="stemmate.server.Role7ServerTests" name="S05 Server rejects a malformed activity ID" time="0.046163384"><system-out>Observed: [activityId must look like ACT-101]
+PASS S05
+</system-out></testcase>
+<testcase classname="stemmate.server.Role7ServerTests" name="S06 Server checks every FR4 element" time="0.056304476"><failure message="Assertion or execution failed">Observed: missing four FR4 elements; validation problems=[]
+java.lang.AssertionError: Server accepts a plan missing steps, timing, materials and inclusion
+	at stemmate.server.TestHarness.require(TestHarness.java:16)
+	at stemmate.server.Role7ServerTests.lambda$cases$8(Role7ServerTests.java:20)
+	at stemmate.server.TestHarness.run(TestHarness.java:32)
+	at stemmate.server.Role7ServerTests.main(Role7ServerTests.java:28)
+</failure><system-out>Observed: missing four FR4 elements; validation problems=[]
+java.lang.AssertionError: Server accepts a plan missing steps, timing, materials and inclusion
+	at stemmate.server.TestHarness.require(TestHarness.java:16)
+	at stemmate.server.Role7ServerTests.lambda$cases$8(Role7ServerTests.java:20)
+	at stemmate.server.TestHarness.run(TestHarness.java:32)
+	at stemmate.server.Role7ServerTests.main(Role7ServerTests.java:28)
+</system-out></testcase>
+<testcase classname="stemmate.server.Role7ServerTests" name="S07 Server line codec preserves special characters" time="0.054283859"><system-out>Observed: encoded=note=Windhoek+caf%C3%A9&amp;title=Water+%26+light+%3D+safe+%22demo%22
+PASS S07
+</system-out></testcase>
+<testcase classname="stemmate.server.Role7ServerTests" name="S08 Health route returns its documented status" time="0.070740181"><system-out>Observed: status=200; body=status=OK
+PASS S08
+</system-out></testcase>
+<testcase classname="stemmate.server.Role7ServerTests" name="S09 Sync route rejects invalid device ID" time="0.08336195"><system-out>Observed: status=400; body=status=ERROR&amp;message=deviceId+is+missing+or+invalid
+PASS S09
+</system-out></testcase>
+<testcase classname="stemmate.server.Role7ServerTests" name="S10 Sync route rejects an oversized body" time="0.09470798"><system-out>Observed: status=400; body=status=ERROR&amp;message=Too+much+data+in+one+request
+PASS S10
+</system-out></testcase>
+<testcase classname="stemmate.server.Role7ServerTests" name="S11 Java server supports the desktop upload route" time="0.072011708"><failure message="Assertion or execution failed">Observed: desktop uses POST /plans; Java server returned 404; status=ERROR&amp;message=Not+found%3A+POST+%2Fplans
+java.lang.AssertionError: Desktop client POST /plans is unsupported by the supplied Java server; prototype/src uses a different /sync protocol
+	at stemmate.server.TestHarness.require(TestHarness.java:16)
+	at stemmate.server.Role7ServerTests.lambda$cases$13(Role7ServerTests.java:25)
+	at stemmate.server.TestHarness.run(TestHarness.java:32)
+	at stemmate.server.Role7ServerTests.main(Role7ServerTests.java:28)
+</failure><system-out>Observed: desktop uses POST /plans; Java server returned 404; status=ERROR&amp;message=Not+found%3A+POST+%2Fplans
+java.lang.AssertionError: Desktop client POST /plans is unsupported by the supplied Java server; prototype/src uses a different /sync protocol
+	at stemmate.server.TestHarness.require(TestHarness.java:16)
+	at stemmate.server.Role7ServerTests.lambda$cases$13(Role7ServerTests.java:25)
+	at stemmate.server.TestHarness.run(TestHarness.java:32)
+	at stemmate.server.Role7ServerTests.main(Role7ServerTests.java:28)
+</system-out></testcase>
+</testsuite>

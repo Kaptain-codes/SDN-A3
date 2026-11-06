@@ -1,0 +1,2 @@
+Observed: three invalid timestamp values rejected
+PASS S04

@@ -1,0 +1,2 @@
+Observed: batch sizes=[20, 20, 5]; saved plans=45
+PASS J15

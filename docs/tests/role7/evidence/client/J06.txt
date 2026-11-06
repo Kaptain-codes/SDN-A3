@@ -1,0 +1,2 @@
+Observed: five missing-element variants rejected
+PASS J06

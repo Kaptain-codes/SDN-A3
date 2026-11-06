@@ -1,0 +1,2 @@
+Observed: [planId is missing, Plan title is required, Safety controls are required (FR4)]
+PASS S02

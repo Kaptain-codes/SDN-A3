@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Role7PrototypeTests" tests="4" failures="1" timestamp="2026-11-06T19:43:44.200954849Z">
+<testcase classname="Role7PrototypeTests" name="P01 Prototype line codec preserves plan text" time="0.068161543"><system-out>Observed: safety=Line+1%0ALine+2&amp;title=Water+%26+bottles+%3D+%22safe%22
+PASS P01
+</system-out></testcase>
+<testcase classname="Role7PrototypeTests" name="P02 Prototype outbox writes and reloads exact lines" time="0.079455492"><system-out>Observed: two lines persisted and restored
+PASS P02
+</system-out></testcase>
+<testcase classname="Role7PrototypeTests" name="P03 Prototype outbox survives a real JVM restart" time="0.166773488"><system-out>Observed: write: wrote queued item
+Observed: read: verified exact item in a new JVM
+PASS P03
+</system-out></testcase>
+<testcase classname="Role7PrototypeTests" name="P04 Outbox write failure reaches its caller" time="0.065068699"><failure message="Assertion or execution failed">Could not save outbox: /workspace/scratch/e3fc6232dd39/work/java_repo/SDN-A3-main/target/role7-cases-7877260011957534989/P04/.stemmate
+Observed: save returned to caller without throwing=true
+java.lang.AssertionError: Outbox.save only prints the write failure and returns normally; caller receives no failure signal
+	at TestHarness.require(TestHarness.java:16)
+	at Role7PrototypeTests.lambda$cases$3(Role7PrototypeTests.java:14)
+	at TestHarness.run(TestHarness.java:32)
+	at Role7PrototypeTests.main(Role7PrototypeTests.java:16)
+</failure><system-out>Could not save outbox: /workspace/scratch/e3fc6232dd39/work/java_repo/SDN-A3-main/target/role7-cases-7877260011957534989/P04/.stemmate
+Observed: save returned to caller without throwing=true
+java.lang.AssertionError: Outbox.save only prints the write failure and returns normally; caller receives no failure signal
+	at TestHarness.require(TestHarness.java:16)
+	at Role7PrototypeTests.lambda$cases$3(Role7PrototypeTests.java:14)
+	at TestHarness.run(TestHarness.java:32)
+	at Role7PrototypeTests.main(Role7PrototypeTests.java:16)
+</system-out></testcase>
+</testsuite>

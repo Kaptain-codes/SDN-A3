@@ -1,0 +1,2 @@
+Observed: batch of 21 rejected; transport calls=0
+PASS J20

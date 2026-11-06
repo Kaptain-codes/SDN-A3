@@ -1,0 +1,2 @@
+Observed: plan and outbox record saved; state=WAITING_TO_SYNC
+PASS J04

@@ -1,0 +1,7 @@
+Observed: durable pending outbox=1; durable plan file is a directory
+java.lang.AssertionError: Orphan durable outbox after failed save; expected=0; actual=1
+	at org.stemmate.testing.TestHarness.require(TestHarness.java:16)
+	at org.stemmate.testing.TestHarness.equal(TestHarness.java:18)
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$32(Role7ClientTests.java:83)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)

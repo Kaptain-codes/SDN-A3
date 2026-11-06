@@ -1,0 +1,12 @@
+Observed: java.lang.ClassCastException: Cannot cast java.lang.String to java.util.LinkedHashMap
+java.lang.AssertionError: Unexpected stored object type crashes startup
+	at org.stemmate.testing.Role7ClientTests.lambda$cases$33(Role7ClientTests.java:85)
+	at org.stemmate.testing.TestHarness.run(TestHarness.java:32)
+	at org.stemmate.testing.Role7ClientTests.main(Role7ClientTests.java:96)
+Caused by: java.lang.ClassCastException: Cannot cast java.lang.String to java.util.LinkedHashMap
+	at java.base/java.lang.Class.cast(Class.java:4069)
+	at org.stemmate.store.FileStoreSupport.read(FileStoreSupport.java:20)
+	at org.stemmate.store.LocalSessionPlanStore.load(LocalSessionPlanStore.java:143)
+	at org.stemmate.store.LocalSessionPlanStore.<init>(LocalSessionPlanStore.java:38)
+	at org.stemmate.store.LocalSessionPlanStore.<init>(LocalSessionPlanStore.java:33)
+	... 3 more
