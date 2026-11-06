@@ -1,0 +1,24 @@
+%% View 2: Containers. Purpose: show the main runnable parts and what each stores or calls.
+%% Requirements: FR2, FR5, FR6, QR1, QR2, SUS1. ADR-001 (laptop first), ADR-002 (Java + Swing), ADR-003 (storage, Role 4 package, section 4).
+flowchart TB
+  subgraph laptop["Shared Windows laptop"]
+    client["STEMCraft client<br/>Java 17, Swing + FlatLaf<br/>BUILT"]
+    files[("Local store<br/>Java-serialised files in .stemmate<br/>BUILT")]
+    sqlite[("Local SQLite database<br/>schema_Patched.sql<br/>DESIGNED, not connected")]
+    standin["Stand-in remote store<br/>in memory, always confirms<br/>BUILT (simulated)"]
+  end
+  subgraph cloud["Server side (not built)"]
+    api["Ballerina API<br/>DESIGNED"]
+    pg[("PostgreSQL<br/>DESIGNED")]
+  end
+  client -->|"reads and writes first"| files
+  client -.->|"target replacement"| sqlite
+  client -->|"sync batches (max 20)"| standin
+  client -.->|"HTTPS, when online"| api
+  api -.-> pg
+  classDef built fill:#dff0d8,stroke:#3c763d,color:#000
+  classDef designed fill:#fcf8e3,stroke:#8a6d3b,stroke-dasharray:5 5,color:#000
+  class client,files,standin built
+  class sqlite,api,pg designed
+%% Legend: green solid = built; yellow dashed = designed only.
+%% Note: the stand-in store always confirms, so the failure path cannot be shown yet (A3 finding F2).
