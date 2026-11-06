@@ -1,0 +1,69 @@
+%% View 3: Components inside the STEMCraft client. Purpose: show layers and dependencies.
+%% Requirements: FR1-FR8, QR1 (local first), SUS1 (sync log). Arrows checked against the imports and App.java at commit 28fef52.
+flowchart TB
+  app["App<br/>composition root: creates the stores,<br/>services, controller and window"]
+  subgraph ui["UI layer"]
+    shell["DesktopShellFrame<br/>screens, role switch"]
+    bar["SyncStatusBar<br/>Online/Offline, pending count"]
+    theme["AppTheme, ThemeComponents, RoundedBorder"]
+  end
+  ctrl["DesktopController<br/>wires the UI to the services"]
+  subgraph svc["Service layer (business logic and validation)"]
+    cat["ActivityCatalogueService<br/>FR1, FR2"]
+    plan["SessionPlanService<br/>FR3, FR4, FR6, FR8"]
+    kit["EquipmentKitService<br/>FR7"]
+  end
+  sync["SyncManager<br/>batches of 20, retry<br/>FR5, QR1, QR2"]
+  conn["ConnectivityMonitor<br/>Online/Offline switch"]
+  subgraph repo["Repository interfaces"]
+    r1["ActivityRepository"]
+    r2["SessionPlanRepository"]
+    r3["OutboxRepository"]
+    r4["SyncLogRepository"]
+    r5["EquipmentKitRepository"]
+    r6["RemoteSessionPlanStore"]
+  end
+  subgraph store["Implementations (files today, SQLite is the target)"]
+    stAct["LocalActivityStore"]
+    stPlan["LocalSessionPlanStore"]
+    stOut["LocalOutboxRepository"]
+    stLog["LocalSyncLogStore"]
+    stKit["LocalEquipmentKitStore"]
+    stRem["LocalRemoteSessionPlanStore<br/>simulated server"]
+    fss["FileStoreSupport<br/>reads and writes the .stemmate files"]
+    mem["InMemoryDraftStore<br/>unused alternative"]
+  end
+  app --> shell
+  app --> ctrl
+  shell --> ctrl
+  shell --> bar
+  shell --> theme
+  ctrl --> cat
+  ctrl --> plan
+  ctrl --> kit
+  ctrl --> sync
+  ctrl --> conn
+  sync --> conn
+  cat --> r1
+  plan --> r2
+  kit --> r5
+  sync --> r3
+  sync --> r2
+  sync --> r4
+  sync --> r6
+  stAct -.->|implements| r1
+  stPlan -.->|implements| r2
+  stOut -.->|implements| r3
+  stLog -.->|implements| r4
+  stKit -.->|implements| r5
+  stRem -.->|implements| r6
+  mem -.->|implements| r2
+  stPlan -->|"queues a record when a plan is finalised"| stOut
+  stAct --> fss
+  stPlan --> fss
+  stOut --> fss
+  stLog --> fss
+  stKit --> fss
+%% Legend: solid arrows point from a class to the class it uses; dashed arrows mean "implements".
+%% Note: SessionPlanService depends only on SessionPlanRepository; the outbox record is created inside LocalSessionPlanStore, which uses the concrete LocalOutboxRepository.
+%% Gap: few accessible names are set in the UI (AC1); there is no sign-in or close warning (QR2).

@@ -1,0 +1,20 @@
+%% View 1: System context. Purpose: show who uses STEMMate and what sits outside it.
+%% Requirements: FR1-FR8 (facilitator), FR7 (custodian), SUS1 (administrator), PR rule: no learner data.
+flowchart LR
+  fac["Facilitator<br/>plans STEM sessions<br/>(FR1-FR6, FR8)"]
+  cus["Equipment custodian<br/>records kit loans (FR7)"]
+  adm["Local administrator<br/>reads the sync-failure log (SUS1)"]
+  sys["STEMMate (STEMCraft desktop client)<br/>shared Windows laptop,<br/>offline first"]
+  srv["Remote STEMMate server<br/>Ballerina API + PostgreSQL<br/>DESIGNED, NOT BUILT"]
+  fac -->|"filters activities,<br/>builds and finalises plans"| sys
+  cus -->|"logs kit checkouts"| sys
+  adm -.->|"reads local log"| sys
+  sys <-.->|"small batches over HTTPS,<br/>only when online"| srv
+  classDef built fill:#dff0d8,stroke:#3c763d,color:#000
+  classDef designed fill:#fcf8e3,stroke:#8a6d3b,stroke-dasharray:5 5,color:#000
+  classDef person fill:#e8eefc,stroke:#31528c,color:#000
+  class sys built
+  class srv designed
+  class fac,cus,adm person
+%% Legend: green solid = built; yellow dashed = designed only; blue = person; dashed arrow = not built or optional.
+%% Constraints: intermittent internet, costly data, shared low-spec laptops, limited support. No learner data is stored.
